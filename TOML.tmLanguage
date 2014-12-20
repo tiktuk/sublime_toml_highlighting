@@ -96,6 +96,8 @@
 					<string>punctuation.definition.comment.toml</string>
 				</dict>
 			</dict>
+			<key>comment</key>
+			<string>Comments</string>
 			<key>match</key>
 			<string>\s*((#).*)$</string>
 		</dict>
@@ -139,6 +141,8 @@
 					<string>constant.other.datetime.toml</string>
 				</dict>
 			</dict>
+			<key>comment</key>
+			<string>DateTime</string>
 			<key>match</key>
 			<string>(?&lt;!\w)(\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[\+\-]\d{2}:\d{2}))(?!\w)</string>
 		</dict>
@@ -189,6 +193,8 @@
 		</dict>
 		<key>keys</key>
 		<dict>
+			<key>comment</key>
+			<string>Key-value pairs</string>
 			<key>patterns</key>
 			<array>
 				<dict>
@@ -310,7 +316,7 @@
 				</dict>
 				<dict>
 					<key>begin</key>
-					<string>^\s*(\[\[])([A-Za-z_][A-Za-z0-9_\.]*)(\]\])\s*</string>
+					<string>^\s*(\[\[)([A-Za-z_][A-Za-z0-9_\.]*)(\]\])\s*</string>
 					<key>beginCaptures</key>
 					<dict>
 						<key>1</key>
@@ -321,7 +327,7 @@
 						<key>2</key>
 						<dict>
 							<key>name</key>
-							<string>support.type.section.name.toml</string>
+							<string>entity.other.attribute-name.table.array.toml</string>
 						</dict>
 						<key>3</key>
 						<dict>
@@ -332,7 +338,7 @@
 					<key>comment</key>
 					<string>A named TOML-Table-Array</string>
 					<key>end</key>
-					<string>(?=^\s*\]?\[[A-Za-z_][A-Za-z0-9_\.]+\]\]?)</string>
+					<string>(?=^\s*\[?\[[A-Za-z_][A-Za-z0-9_\.]*\]\]?)</string>
 					<key>name</key>
 					<string>meta.tag.table.array.toml</string>
 				</dict>
@@ -359,7 +365,7 @@
 						<key>2</key>
 						<dict>
 							<key>name</key>
-							<string>entity.other.attribute-name.toml</string>
+							<string>entity.other.attribute-name.table.toml</string>
 						</dict>
 						<key>3</key>
 						<dict>
@@ -370,7 +376,7 @@
 					<key>comment</key>
 					<string>A named TOML-Table</string>
 					<key>end</key>
-					<string>(?=^\s*\]?\[[A-Za-z_][A-Za-z0-9_\.]+\]\]?)</string>
+					<string>(?=^\s*\[?\[[A-Za-z_][A-Za-z0-9_\.]*\]\]?)</string>
 					<key>name</key>
 					<string>meta.tag.table.toml</string>
 					<key>patterns</key>

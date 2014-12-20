@@ -8,10 +8,7 @@ uuid: ffffeb76-439f-4c5e-b60f-d8a13606d63d
 patterns:
 - include: '#comments'
 
-# top level elements: table
 - include: '#tables'
-
-# top level elements: key-value pairs
 - include: '#keys'
 
 - include: '#illegal'
@@ -23,6 +20,7 @@ repository:
     captures:
       '1': {name: comment.line.number-sign.toml}
       '2': {name: punctuation.definition.comment.toml}
+    comment: Comments
   
   tables:
     patterns:
@@ -31,12 +29,13 @@ repository:
       end: (?=^\s*\[?\[.*\]\]?)
       comment: "non-empty etc. like tables, see below!"
     - name: meta.tag.table.array.toml
-      begin: ^\s*(\[\[])([A-Za-z_][A-Za-z0-9_\.]*)(\]\])\s*
+      begin: ^\s*(\[\[)([A-Za-z_][A-Za-z0-9_\.]*)(\]\])\s*
       beginCaptures:
         '1': {name: punctuation.definition.table.array.toml}
-        '2': {name: support.type.section.name.toml}
+        '2': {name: entity.other.attribute-name.table.array.toml}
         '3': {name: punctuation.definition.table.array.toml}
-      end: (?=^\s*\]?\[[A-Za-z_][A-Za-z0-9_\.]+\]\]?)
+  #    end: (?=^\s*\[?\[[A-Za-z_][A-Za-z0-9_\.]*\]\]?)
+      end: (?=^\s*\[?\[[A-Za-z_][A-Za-z0-9_\.]*\]\]?)
       comment: A named TOML-Table-Array
 
     - name: invalid.illegal.table.toml
@@ -47,9 +46,9 @@ repository:
       begin: ^\s*(\[)([A-Za-z_][A-Za-z0-9_\.]*)(\])\s*
       beginCaptures:
         '1': {name: punctuation.definition.table.toml}
-        '2': {name: entity.other.attribute-name.toml}
+        '2': {name: entity.other.attribute-name.table.toml}
         '3': {name: punctuation.definition.table.toml}
-      end: (?=^\s*\]?\[[A-Za-z_][A-Za-z0-9_\.]+\]\]?)
+      end: (?=^\s*\[?\[[A-Za-z_][A-Za-z0-9_\.]*\]\]?)
       comment: A named TOML-Table
       patterns:
       - include: '#comments'
@@ -73,6 +72,7 @@ repository:
       - include: '#comments'
       - include: '#dataTypes'
       - include: '#illegal'
+    comment: Key-value pairs
 
   dataTypes:
     patterns:
@@ -107,6 +107,7 @@ repository:
     match: (?<!\w)(\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[\+\-]\d{2}:\d{2}))(?!\w)
     captures:
       '1': {name: constant.other.datetime.toml}
+    comment: DateTime
 
   float:
     match: (?<!\w)([\+\-]?(?:[1-9][0-9]*|0)(?:(?:\.[0-9]*)?[eE][\+\-]?[1-9][0-9]*|(?:\.[0-9]*)))(?!\w)

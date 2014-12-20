@@ -78,8 +78,8 @@ a=6.626e-34
 a=true
 a=false
 
- = "what"
-a =
+a = "what"
+a = 5
 
 key = [
   1, 2, 3
@@ -97,5 +97,9 @@ a =1979-05-27T00:32:00.999999-07:00
 a=[ 1, 2, 3 ]
 a=[ "red", "yellow", "green" ]
 a=[ [ 1, 2 ], [3, 4, 5] ]
-[ [ 1, 2 ], ["a", "b", "c"] ] # this is ok
-[ 1, 2.0 ] # note: this is NOT ok
+a=[ [ 1, 2 ], ["a", "b", "c"] ] # this is ok
+a=[ 1, 2.0 ] # note: this is NOT ok
+
+[[Array.of.table]]
+
+[table]
