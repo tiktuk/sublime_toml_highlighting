@@ -341,6 +341,21 @@
 					<string>(?=^\s*\[?\[[A-Za-z_][A-Za-z0-9_\.]*\]\]?)</string>
 					<key>name</key>
 					<string>meta.tag.table.array.toml</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>#comments</string>
+						</dict>
+						<dict>
+							<key>include</key>
+							<string>#keys</string>
+						</dict>
+						<dict>
+							<key>include</key>
+							<string>#illegal</string>
+						</dict>
+					</array>
 				</dict>
 				<dict>
 					<key>begin</key>
@@ -376,7 +391,7 @@
 					<key>comment</key>
 					<string>A named TOML-Table</string>
 					<key>end</key>
-					<string>(?=^\s*\[?\[[A-Za-z_][A-Za-z0-9_\.]*\]\]?)</string>
+					<string>(?=(?:^\s*\[?\[[A-Za-z_][A-Za-z0-9_\.]*\]\]?|^$))</string>
 					<key>name</key>
 					<string>meta.tag.table.toml</string>
 					<key>patterns</key>

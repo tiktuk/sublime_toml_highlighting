@@ -14,7 +14,6 @@ patterns:
 - include: '#illegal'
 
 repository:
-  # control sequences
   comments:
     match: \s*((#).*)$
     captures:
@@ -34,9 +33,12 @@ repository:
         '1': {name: punctuation.definition.table.array.toml}
         '2': {name: entity.other.attribute-name.table.array.toml}
         '3': {name: punctuation.definition.table.array.toml}
-  #    end: (?=^\s*\[?\[[A-Za-z_][A-Za-z0-9_\.]*\]\]?)
       end: (?=^\s*\[?\[[A-Za-z_][A-Za-z0-9_\.]*\]\]?)
       comment: A named TOML-Table-Array
+      patterns:
+      - include: '#comments'
+      - include: '#keys'
+      - include: '#illegal'
 
     - name: invalid.illegal.table.toml
       begin: ^\s*(\[\]|\[\..*\]|\[.*\.\]|\[.*\.\..*\]|\[.*[\[\]#].*\]|\[.*\].+\n)
@@ -140,9 +142,8 @@ repository:
     comment: Array
 
   illegal:
-    # Match everything unmatched as illegal
     match: (.*)
     captures:
       '1': {name: invalid.illegal.toml}
-    comment: Invalid things
+    comment: Invalid things -> everything unmatched
 ...
