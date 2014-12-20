@@ -172,7 +172,7 @@
 				</dict>
 			</dict>
 			<key>comment</key>
-			<string>Invalid things</string>
+			<string>Invalid things -&gt; everything unmatched</string>
 			<key>match</key>
 			<string>(.*)</string>
 		</dict>
@@ -391,7 +391,7 @@
 					<key>comment</key>
 					<string>A named TOML-Table</string>
 					<key>end</key>
-					<string>(?=(?:^\s*\[?\[[A-Za-z_][A-Za-z0-9_\.]*\]\]?|^$))</string>
+					<string>(?=^\s*\[?\[[A-Za-z_][A-Za-z0-9_\.]*\]\]?)</string>
 					<key>name</key>
 					<string>meta.tag.table.toml</string>
 					<key>patterns</key>
