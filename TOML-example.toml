@@ -103,3 +103,12 @@ a=[ 1, 2.0 ] # note: this is NOT ok
 [[Array.of.table]]
 
 [table]
+
+[table]
+key = "value"
+bare_key = "value"
+bare-key = "value"
+
+"127.0.0.1" = "value"
+"character encoding" = "value"
+"ʎǝʞ" = "value"
