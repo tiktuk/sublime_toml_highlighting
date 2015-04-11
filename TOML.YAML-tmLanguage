@@ -65,7 +65,7 @@ repository:
     - name: invalid.deprecated.noValueGiven.toml
       match: ^(\s*[A-Za-z_][A-Za-z0-9_]*\s*=)(?=\s*$)
       comment: Assignments without value are unusual
-    - begin: '^\s*([A-Za-z_][A-Za-z0-9_]*)\s*(=)\s*'
+    - begin: '^\s*([A-Za-z_-][A-Za-z0-9_-]*|".+")\s*(=)\s*'
       end: ($|(?==))
       beginCaptures:
         '1': {name: keyword.key.toml}
