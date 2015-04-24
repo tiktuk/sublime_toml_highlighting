@@ -28,12 +28,12 @@ repository:
       end: (?=^\s*\[?\[.*\]\]?)
       comment: "non-empty etc. like tables, see below!"
     - name: meta.tag.table.array.toml
-      begin: ^\s*(\[\[)([A-Za-z_][A-Za-z0-9_\.]*)(\]\])\s*
+      begin: ^\s*(\[\[)([A-Za-z_][A-Za-z0-9_\.-]*)(\]\])\s*
       beginCaptures:
         '1': {name: punctuation.definition.table.array.toml}
         '2': {name: entity.other.attribute-name.table.array.toml}
         '3': {name: punctuation.definition.table.array.toml}
-      end: (?=^\s*\[?\[[A-Za-z_][A-Za-z0-9_\.]*\]\]?)
+      end: (?=^\s*\[?\[[A-Za-z_][A-Za-z0-9_\.-]*\]\]?)
       comment: A named TOML-Table-Array
       patterns:
       - include: '#comments'
@@ -45,12 +45,12 @@ repository:
       end: (?=^\s*\[?\[.*\]\]?)
       comment: "Each table name segment must be non-empty, must not contain the characters '[', ']' or '#' and is delimited by a '.'.  Tables \"appear in square brackets *on a line by themselves*\""
     - name: meta.tag.table.toml
-      begin: ^\s*(\[)([A-Za-z_][A-Za-z0-9_\.]*)(\])\s*
+      begin: ^\s*(\[)([A-Za-z_][A-Za-z0-9_\.-]*)(\])\s*
       beginCaptures:
         '1': {name: punctuation.definition.table.toml}
         '2': {name: entity.other.attribute-name.table.toml}
         '3': {name: punctuation.definition.table.toml}
-      end: (?=^\s*\[?\[[A-Za-z_][A-Za-z0-9_\.]*\]\]?)
+      end: (?=^\s*\[?\[[A-Za-z_][A-Za-z0-9_\.-]*\]\]?)
       comment: A named TOML-Table
       patterns:
       - include: '#comments'
@@ -65,7 +65,7 @@ repository:
     - name: invalid.deprecated.noValueGiven.toml
       match: ^(\s*[A-Za-z_][A-Za-z0-9_]*\s*=)(?=\s*$)
       comment: Assignments without value are unusual
-    - begin: '^\s*([A-Za-z_-][A-Za-z0-9_-]*|".+")\s*(=)\s*'
+    - begin: '^\s*([A-Za-z_-][A-Za-z0-9_\-]*|".+")\s*(=)\s*'
       end: ($|(?==))
       beginCaptures:
         '1': {name: keyword.key.toml}
