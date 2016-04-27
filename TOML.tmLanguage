@@ -253,7 +253,7 @@
 				</dict>
 				<dict>
 					<key>begin</key>
-					<string>\s*([A-Za-z_-][A-Za-z0-9_-]*|".+")\s*(=)\s*</string>
+					<string>\s*([A-Za-z_-][A-Za-z0-9_-]*|".+"|'.+'|[0-9]+)\s*(=)\s*</string>
 					<key>beginCaptures</key>
 					<dict>
 						<key>1</key>

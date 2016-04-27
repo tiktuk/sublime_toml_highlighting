@@ -20,7 +20,7 @@ repository:
       '1': {name: comment.line.number-sign.toml}
       '2': {name: punctuation.definition.comment.toml}
     comment: Comments
-  
+
   tables:
     patterns:
     - name: invalid.illegal.table.array.toml
@@ -56,7 +56,7 @@ repository:
       - include: '#comments'
       - include: '#keys'
       - include: '#illegal'
-      
+
   keys:
     patterns:
     - name: invalid.illegal.noKeyDefined.toml
@@ -65,7 +65,7 @@ repository:
     - name: invalid.deprecated.noValueGiven.toml
       match: (\s*[A-Za-z_\-][A-Za-z0-9_\-]*\s*=)(?=\s*$)
       comment: Assignments without value are unusual
-    - begin: '\s*([A-Za-z_-][A-Za-z0-9_-]*|".+")\s*(=)\s*'
+    - begin: \s*([A-Za-z_-][A-Za-z0-9_-]*|".+"|'.+'|[0-9]+)\s*(=)\s*
       end: ($|(?==)|\,|\s*\})
       beginCaptures:
         '1': {name: keyword.key.toml}
