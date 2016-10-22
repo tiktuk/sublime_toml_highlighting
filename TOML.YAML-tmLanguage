@@ -66,7 +66,7 @@ repository:
       match: (\s*[A-Za-z_\-][A-Za-z0-9_\-]*\s*=)(?=\s*$)
       comment: Assignments without value are unusual
     - begin: \s*([A-Za-z_-][A-Za-z0-9_-]*|".+"|'.+'|[0-9]+)\s*(=)\s*
-      end: ($|(?==)|\,|\s*\})
+      end: ($|(?==)|\,|\s*(?=\}))
       beginCaptures:
         '1': {name: keyword.key.toml}
         '2': {name: punctuation.definition.keyValuePair.toml}
