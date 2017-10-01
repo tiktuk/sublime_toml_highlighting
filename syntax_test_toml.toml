@@ -7,91 +7,146 @@
 ##############################################################################
 # Table name tests
 ##############################################################################
-[table]
-# <- meta.tag.table punctuation.definition.table
-#^^^^^ meta.tag.table entity.other.attribute-name.table
-#     ^ meta.tag.table punctuation.definition.table
+[table]  # comment
+# <- punctuation.definition.table.begin - entity.name.table
+#^^^^^ entity.name.table
+#     ^ punctuation.definition.table.end - entity.name.table
+#        ^ punctuation.definition.comment
+#        ^^^^^^^^^ comment.line.number-sign
 
 [nested.table]
-# <- punctuation.definition.table
-#^^^^^^^^^^^^ meta.tag.table entity.other.attribute-name.table
-#            ^ meta.tag.table punctuation.definition.table
+# <- punctuation.definition.table.begin - entity.name.table
+#^^^^^^^^^^^^ entity.name.table
+#      ^ punctuation.separator.table
+#            ^ punctuation.definition.table.end - entity.name.table
+
+['quoted']
+#^ punctuation.definition.string.begin
+#^^^^^^^^entity.name.table string.quoted.single.literal
+#       ^ punctuation.definition.string.end
+#        ^ punctuation.definition.table.end
+
+["quoted"]
+#^ punctuation.definition.string.begin
+#^^^^^^^^entity.name.table string.quoted.double.basic
+#       ^ punctuation.definition.string.end
+#        ^ punctuation.definition.table.end
 
 [a.b.c]
-# <- meta.tag.table punctuation.definition.table
-#^^^^^ meta.tag.table entity.other.attribute-name.table
-#     ^ meta.tag.table punctuation.definition.table
-
-# Not yet supported:
-#[table]  # comment
-#['quoted']
-#["quoted"]
-#[ d.e.f ]
-#[ g .  h  . i ]
-#[ j . "ʞ" . 'l' ]
-#['a'."b"]
+# <- punctuation.definition.table.begin - entity.name.table
+#^^^^^ entity.name.table
+# ^ punctuation.separator.table
+#   ^ punctuation.separator.table
+#     ^ punctuation.definition.table.end - entity.name.table
+[ d.e.f ]
+# <- punctuation.definition.table.begin - entity.name.table
+#^ -entity.name.table
+# ^^^^^ entity.name.table
+#  ^ punctuation.separator.table
+#    ^ punctuation.separator.table
+#      ^ -entity.name.table
+#       ^ punctuation.definition.table.end - entity.name.table
+[ g .  h  . i ]
+# ^^^^^^^^^^^ entity.name.table
+#   ^ punctuation.separator.table
+#         ^ punctuation.separator.table
+#             ^ punctuation.definition.table.end
+[ j . "ʞ" . 'l' ]
+# <- punctuation.definition.table.begin
+# ^^^^^^^^^^^^^ entity.name.table
+#   ^ punctuation.separator.table
+#         ^ punctuation.separator.table
+#               ^ punctuation.definition.table.end
+['a'."b"]
+#^^^^^^^ entity.name.table
+#^ punctuation.definition.string.begin
+#^^^ string.quoted.single.literal
+#  ^ punctuation.definition.string.end
+#   ^ punctuation.separator.table
+#    ^^^ string.quoted.double.basic
+#    ^ punctuation.definition.string.begin
+#      ^ punctuation.definition.string.end
+#       ^ punctuation.definition.table.end
 
 #-----------------------------------------------------------------------------
 # Array tables
 #-----------------------------------------------------------------------------
  [[array-table]]
-#^^ meta.tag.table.array punctuation.definition.table.array
-#  ^^^^^^^^^^^ meta.tag.table.array entity.other.attribute-name.table.array
-#             ^^ meta.tag.table.array punctuation.definition.table.array
-
-# Not yet supported:
-# [[a.b.'nest'."name"]]
+#^^ punctuation.definition.table.array.begin
+#  ^^^^^^^^^^^ entity.name.table.array
+#             ^^ punctuation.definition.table.array.end
+ [[a.b.'nest'."name"]]
+#^^ punctuation.definition.table.array.begin
+#  ^^^^^^^^^^^^^^^^^ entity.name.table.array
+#   ^ punctuation.separator.table
+#     ^ punctuation.separator.table
+#      ^ punctuation.definition.string.begin
+#      ^^^^^^ string.quoted.single.literal
+#           ^ punctuation.definition.string.end
+#            ^ punctuation.separator.table
+#             ^ punctuation.definition.string.begin
+#             ^^^^^^ string.quoted.double.basic
+#                  ^ punctuation.definition.string.end
+#                   ^^ punctuation.definition.table.array.end
 
 #-----------------------------------------------------------------------------
 # Invalid tables
 #-----------------------------------------------------------------------------
 []     # INVALID
-# <- meta.tag.table.array invalid.illegal
-#^^^^^^^^^^^^^^^ meta.tag.table.array invalid.illegal
+# <- invalid.illegal
+#^ invalid.illegal
+#      ^^^^^^^^^ comment.line.number-sign
  [[]]
-#^^^^ meta.tag.table.array invalid.illegal
+#^^^^ invalid.illegal
  [ ]
-#^^^ meta.tag.table.array invalid.illegal
+#^^^ invalid.illegal
  [ [ ] ]
-#^^^^^^^ meta.tag.table.array invalid.illegal
+#  ^^^^^ invalid.illegal
 [a.]   # INVALID
-# <- invalid.illegal.table
-#^^^^^^^^^^^^^^^^ invalid.illegal.table
+# <- punctuation.definition.table.begin
+#^^ entity.name.table
+#  ^ invalid.illegal
 [a..] # INVALID
-#^^^^^^^^^^^^^^^ invalid.illegal.table
+#^^ entity.name.table
+#  ^ invalid.illegal
+#   ^ punctuation.definition.table.end
 [.b]   # INVALID
-#^^^^^^^^^^^^^^^^ invalid.illegal.table
+#^^^ invalid.illegal
+#      ^^^^^^^^^ comment.line.number-sign
 [.]    # INVALID
-#^^^^^^^^^^^^^^^^ invalid.illegal.table
+#^^ invalid.illegal
+#      ^^^^^^^^^ comment.line.number-sign
 [table]key = 123
-#^^^^^^^^^^^^^^^^ invalid.illegal.table
+#^^^^^ entity.name.table
+#      ^^^^^^^^^ invalid.illegal
 [a'asdf']
-#^^^^^^^^ invalid.illegal
+# ^ invalid.illegal
+#      ^ invalid.illegal
+#       ^ punctuation.definition.table.end
 [!@$%^&*]
 #^^^^^^^^ invalid.illegal
 [
-#<- invalid.illegal
-["
 #^ invalid.illegal
+["
+# ^ invalid.illegal
 ['
 #^ invalid.illegal
 [[
-#^ invalid.illegal
+# ^ invalid.illegal
  [[]
-#^^^^ invalid.illegal.table
+#^^^ invalid.illegal
  [[array]
-#^^^^^^^^^ invalid.illegal.table
+#        ^ invalid.illegal
  [ [array]]
-#^^^^^^^^^^^ invalid.illegal.table
+#  ^^^^^^^^ invalid.illegal
  [[array] ]
-#^^^^^^^^^^^ invalid.illegal.table
+#        ^^ invalid.illegal
  [a[b]
-#^^^^^^ invalid.illegal.table
+#  ^ invalid.illegal
  [a b]
-#^^^^^ invalid.illegal
-
-# This does do error recovery:
-# [a#b]
+#  ^ invalid.illegal
+ [a#b]
+#  ^ invalid.illegal
 
 ##############################################################################
 # Keys

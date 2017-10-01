@@ -308,41 +308,51 @@ contexts:
       pop: true
 
   tables:
-    - match: '\s*(\[\[\]\]|\[\[\..*\]\]|\[\[.*\.\]\]|\[\[.*\.\..*\]\]|\[\[.*[\[\]#].*\]\]|\[\[.*\]\].+\n)'
-      comment: non-empty etc. like tables, see below!
-      push:
-        - meta_scope: invalid.illegal.table.array.toml
-        - match: '(?=\s*\[?\[.*\]\]?)'
-          pop: true
-    - match: '\s*(\[\[)([A-Za-z_\-][A-Za-z0-9_\-\.]*)(\]\])\s*'
-      comment: A named TOML-Table-Array
+    - match: '\[?\[{{ws}}\]\]?'
+      scope: invalid.illegal.table.toml
+
+    - match: '(\[\[){{ws}}'
+      # Array table.  Same as std-table with double-brackets.
       captures:
-        1: punctuation.definition.table.array.toml
-        2: entity.other.attribute-name.table.array.toml
-        3: punctuation.definition.table.array.toml
-      push:
-        - meta_scope: meta.tag.table.array.toml
-        - match: '(?=\s*\[?\[[A-Za-z_\-][A-Za-z0-9_\-\.]*\]\]?)'
-          pop: true
-        - include: comments
-        - include: keys
-        - include: illegal
-    - match: '\s*(\[\]|\[\..*\]|\[.*\.\]|\[.*\.\..*\]|\[.*[\[\]#].*\]|\[.*\].+\n)'
-      comment: 'Each table name segment must be non-empty, must not contain the characters ''['', '']'' or ''#'' and is delimited by a ''.''.  Tables "appear in square brackets *on a line by themselves*"'
-      push:
-        - meta_scope: invalid.illegal.table.toml
-        - match: '(?=\s*\[?\[.*\]\]?)'
-          pop: true
-    - match: '\s*(\[)([A-Za-z_\-][A-Za-z0-9_\-\.]*)(\])\s*'
-      comment: A named TOML-Table
+        1: punctuation.definition.table.array.begin.toml
+      push: [maybe-comment-eol, table-array-name]
+
+    - match: '(\[){{ws}}'
+      # std-table = ws "[" ws key (ws "." ws key)* ws "]" ws comment?
       captures:
-        1: punctuation.definition.table.toml
-        2: entity.other.attribute-name.table.toml
-        3: punctuation.definition.table.toml
-      push:
-        - meta_scope: meta.tag.table.toml
-        - match: '(?=\s*\[?\[[A-Za-z_\-][A-Za-z0-9_\-\.]*\]\]?)'
-          pop: true
-        - include: comments
-        - include: keys
-        - include: illegal
+        1: punctuation.definition.table.begin.toml
+      push: [maybe-comment-eol, table-name]
+
+  table-name:
+    - meta_content_scope: entity.name.table.toml
+    - match: '{{ws}}(\])'
+      captures:
+        1: punctuation.definition.table.end.toml
+      pop: true
+    - include: table-name-inc
+
+  table-array-name:
+    - meta_content_scope: entity.name.table.array.toml
+    - match: '{{ws}}(\]\])'
+      captures:
+        1: punctuation.definition.table.array.end.toml
+      pop: true
+    - include: table-name-inc
+
+  table-name-inc:
+    - match: '{{peek_key_start}}'
+      push: [nested-key, key-noscope]
+    - match: '[^\]]+\]?'
+      scope: invalid.illegal.table.toml
+      pop: true
+
+  nested-key:
+    - match: '{{ws}}(\.){{ws}}'
+      captures:
+        1: punctuation.separator.table.toml
+      push: key-noscope
+    - match: '(?={{ws}}\])'
+      pop: true
+    - match: '.'
+      scope: invalid.illegal.table-key.toml
+      pop: true
