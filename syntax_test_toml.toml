@@ -183,9 +183,9 @@ a = 1 b = 2
 # Boolean
 ##############################################################################
 key = true
-#     ^^^^ constant.other.boolean
+#     ^^^^ constant.language
 key = false # COMMENT
-#     ^^^^^ constant.other.boolean
+#     ^^^^^ constant.language
 #           ^^^^^^^^^ comment.line.number-sign
 
 #-----------------------------------------------------------------------------
@@ -568,7 +568,7 @@ t = {b=true, i=1, f=1.0, dt=1979-05-27T07:32:00Z, s1='s', s2="s", s3='''s''', s4
 #   ^ punctuation.definition.inlinetable
 #    ^ keyword.key
 #     ^ punctuation.definition.keyValuePair
-#      ^^^^ constant.other.boolean
+#      ^^^^ constant.language
 #            ^ keyword.key
 #             ^ punctuation.definition.keyValuePair
 #              ^ constant.numeric.integer
