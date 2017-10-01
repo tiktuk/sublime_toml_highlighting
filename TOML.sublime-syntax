@@ -18,6 +18,41 @@ variables:
   # exp = ("e" / "E") integer
   exp: '[eE] {{integer}}'
 
+  # date-time      = offset-date-time / local-date-time / local-date / local-time
+  date_time: '{{offset_date_time}} | {{local_date_time}} | {{local_date}} | {{local_time}}'
+  # date-fullyear  = 4DIGIT
+  date_fullyear: '[0-9]{4}'
+  # date-month     = 2DIGIT  ; 01-12
+  date_month: '[0-1][0-9]'
+  # date-mday      = 2DIGIT  ; 01-28, 01-29, 01-30, 01-31 based on month/year
+  date_mday: '[0-3][0-9]'
+  # time-hour      = 2DIGIT  ; 00-23
+  time_hour: '[0-2][0-9]'
+  # time-minute    = 2DIGIT  ; 00-59
+  time_minute: '[0-5][0-9]'
+  # time-second    = 2DIGIT  ; 00-58, 00-59, 00-60 based on leap second rules
+  time_second: '[0-6][0-9]'
+  # time-secfrac   = "." 1*DIGIT
+  time_secfrac: '\.[0-9]+'
+  # time-numoffset = ( "+" / "-" ) time-hour ":" time-minute
+  time_numoffset: '[+-] {{time_hour}} : {{time_minute}}'
+  # time-offset    = "Z" / time-numoffset
+  time_offset: '(?: Z | {{time_numoffset}} )'
+  # partial-time   = time-hour ":" time-minute ":" time-second [time-secfrac]
+  partial_time: '{{time_hour}} : {{time_minute}} : {{time_second}} (?: {{time_secfrac}} )?'
+  # full-date      = date-fullyear "-" date-month "-" date-mday
+  full_date: '{{date_fullyear}} - {{date_month}} - {{date_mday}}'
+  # full-time      = partial-time time-offset
+  full_time: '{{partial_time}} {{time_offset}}'
+  # offset-date-time = full-date "T" full-time
+  offset_date_time: '{{full_date}} T {{full_time}}'
+  # local-date-time = full-date "T" partial-time
+  local_date_time: '{{full_date}} T {{partial_time}}'
+  # local-date = full-date
+  local_date: '{{full_date}}'
+  # local-time = partial-time
+  local_time: '{{partial_time}}'
+
 contexts:
   main:
     - include: comments
@@ -72,10 +107,8 @@ contexts:
         1: keyword.operator.arithmetic.toml
 
   date-time:
-    - match: '(?<!\w)(\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[\+\-]\d{2}:\d{2}))(?!\w)'
-      comment: DateTime
-      captures:
-        1: constant.other.datetime.toml
+    - match: '(?x) {{date_time}}'
+      scope: constant.other.datetime.toml
 
   string:
     - match: "'''"
