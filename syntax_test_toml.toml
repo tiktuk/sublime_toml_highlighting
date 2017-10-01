@@ -206,18 +206,22 @@ a = 0 # Comment
 #     ^^^^^^^^^ comment.line.number-sign
 # Spec needs clarification here, see: https://github.com/toml-lang/toml/issues/389
 a = +0
-#   ^^ invalid.illegal
+#   ^ keyword.operator.arithmetic
+#   ^^ constant.numeric.integer
 a = -0
-#   ^^ invalid.illegal
+#   ^ keyword.operator.arithmetic
+#   ^^ constant.numeric.integer
 a = 123
 #   ^^^ constant.numeric.integer
 a = -456
+#   ^ keyword.operator.arithmetic
 #   ^^^^ constant.numeric.integer
-
-# Not yet supported:
-#a = 1_000
-#a = 5_349_221
-#a = 1_2_3_4_5     # VALID but discouraged
+a = 1_000
+#   ^^^^^ constant.numeric.integer
+a = 5_349_221
+#   ^^^^^^^^^ constant.numeric.integer
+a = 1_2_3_4_5     # VALID but discouraged
+#   ^^^^^^^^^ constant.numeric.integer
 
 #-----------------------------------------------------------------------------
 # Invalid integers
@@ -254,31 +258,32 @@ a = 1 2
 # Float
 ##############################################################################
 a = +1.0
+#   ^ keyword.operator.arithmetic
 #   ^^^^ constant.numeric.float
 a = 3.1415
 #   ^^^^^^ constant.numeric.float
 a = -0.01
+#   ^ keyword.operator.arithmetic
 #   ^^^^^ constant.numeric.float
 a = 5e+22
 #   ^^^^^ constant.numeric.float
 a = 1e6
 #   ^^^ constant.numeric.float
 a = -2E-2
+#   ^ keyword.operator.arithmetic
 #   ^^^^^ constant.numeric.float
 a = 6.626e-34
 #   ^^^^^^^^^ constant.numeric.float
-
-# Not yet supported:
-#a = 9_224_617.445_991_228_313
+a = 9_224_617.445_991_228_313
+#   ^^^^^^^^^^^^^^^^^^^^^^^^^ constant.numeric.float
 
 #-----------------------------------------------------------------------------
 # Invalid float
 #-----------------------------------------------------------------------------
 a = x1.0
 #   ^^^^ invalid.illegal
-# This is erroneously accepted:
 a = 0.
-#   ^^ constant.numeric.float
+#    ^ invalid.illegal
 a = .0
 #   ^^ invalid.illegal
 a = +.0

@@ -9,6 +9,15 @@ file_extensions:
 
 scope: source.toml
 
+variables:
+  # integer = [ "-" / "+" ] int
+  # int = DIGIT / digit1-9 1*( DIGIT / "_" DIGIT )
+  integer: '([\+\-]?) (?: [0-9] | [1-9] (?: [0-9] | _ [0-9] )+ )'
+  # frac = "." DIGIT *( DIGIT / "_" DIGIT )
+  frac: '\. [0-9] (?: [0-9] | _ [0-9] )*'
+  # exp = ("e" / "E") integer
+  exp: '[eE] {{integer}}'
+
 contexts:
   main:
     - include: comments
@@ -43,16 +52,24 @@ contexts:
         1: constant.language.toml
 
   integer:
-    - match: '(?<!\w)((?:[\+\-]?[1-9][0-9]*|0))(?!\w)'
-      comment: Integer (with and without + and - prefixes)
+    - match: '(?x) (?<!\w) {{integer}} (?!\w)'
       captures:
-        1: constant.numeric.integer.toml
+        0: constant.numeric.integer.toml
+        1: keyword.operator.arithmetic.toml
 
   float:
-    - match: '(?<!\w)([\+\-]?(?:[1-9][0-9]*|0)(?:(?:\.[0-9]*)?[eE][\+\-]?[1-9][0-9]*|(?:\.[0-9]*)))(?!\w)'
-      comment: Float, decimal and exponential representation
+    # float = integer ( frac / ( frac exp ) / exp )
+    # frac = "." DIGIT *( DIGIT / "_" DIGIT )
+    # exp = ("e" / "E") integer
+    - match: |-
+        (?x)
+          (?<!\w)
+            {{integer}}
+            (?: {{frac}} | (?: {{frac}} {{exp}} ) | {{exp}} )
+          (?!\w)
       captures:
-        1: constant.numeric.float.toml
+        0: constant.numeric.float.toml
+        1: keyword.operator.arithmetic.toml
 
   date-time:
     - match: '(?<!\w)(\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[\+\-]\d{2}:\d{2}))(?!\w)'
