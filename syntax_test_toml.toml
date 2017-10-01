@@ -124,7 +124,9 @@ nospace=123
 #<- keyword.key
 #^^^^^^^^^^^^^^^ keyword.key
 #                ^ punctuation.definition.keyValuePair
-#                  ^^^^^^^ string.quoted.single.basic.line
+#                  ^ punctuation.definition.string.begin
+#                  ^^^^^^^ string.quoted.double.basic
+#                        ^ punctuation.definition.string.end
  123 = 123
 #^^^ keyword.key
 #    ^ punctuation.definition.keyValuePair
@@ -171,7 +173,7 @@ key = 123'asdf'
 #^^ keyword.key
 #   ^ punctuation.definition.keyValuePair
 #     ^^^ constant.numeric.integer
-#        ^^^^^^ string.quoted.single.literal.line
+#        ^^^^^^ string.quoted.single.literal
 key# comment
 #^^^^^^^^^^^ invalid.illegal
 key = = 1
@@ -351,79 +353,126 @@ with-milli = 1987-07-5T17:45:00.12Z
 # String
 ##############################################################################
 s = "" # Comment
-#   ^^ string.quoted.single.basic.line
-#      ^ comment.line.number-sign punctuation.definition.comment
+#   ^^ string.quoted.double.basic
+#   ^ punctuation.definition.string.begin
+#    ^ punctuation.definition.string.end
 #      ^^^^^^^^^ comment.line.number-sign
 s = "I'm a string. \"You can quote me\". Name\tJos\u00E9\nLocation\tSF."
-#   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ string.quoted.single.basic.line
+#   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ string.quoted.double.basic
+#   ^ punctuation.definition.string.begin
+#                  ^^ constant.character.escape
+#                                    ^^ constant.character.escape
+#                                            ^^ constant.character.escape
+#                                                 ^^^^^^^^ constant.character.escape
+#                                                                 ^^ constant.character.escape
+#                                                                      ^ punctuation.definition.string.end
 s = "\b\t\n\f\r\"\\\u1234\U12345678"
-#   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ string.quoted.single.basic.line
+#   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ string.quoted.double.basic
+#   ^ punctuation.definition.string.begin
+#    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ constant.character.escape
+#                                  ^ punctuation.definition.string.end
 s = ''
-#   ^^ string.quoted.single.literal.line
+#   ^^ string.quoted.single.literal
+#   ^ punctuation.definition.string.begin
+#    ^ punctuation.definition.string.end
 winpath  = 'C:\Users\nodejs\templates'
-#          ^^^^^^^^^^^^^^^^^^^^^^^^^^^ string.quoted.single.literal.line
+#          ^^^^^^^^^^^^^^^^^^^^^^^^^^^ string.quoted.single.literal
+#          ^ punctuation.definition.string.begin
+#                                    ^ punctuation.definition.string.end
 winpath2 = '\\ServerX\admin$\system32\'
-#          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ string.quoted.single.literal.line
+#          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ string.quoted.single.literal
+#          ^ punctuation.definition.string.begin
+#                                     ^ punctuation.definition.string.end
 quoted   = 'Tom "Dubs" Preston-Werner'
-#          ^^^^^^^^^^^^^^^^^^^^^^^^^^^ string.quoted.single.literal.line
+#          ^^^^^^^^^^^^^^^^^^^^^^^^^^^ string.quoted.single.literal
+#          ^ punctuation.definition.string.begin
+#                                    ^ punctuation.definition.string.end
 regex    = '<\i\c*\s*>'
-#          ^^^^^^^^^^^^ string.quoted.single.literal.line
+#          ^^^^^^^^^^^^ string.quoted.single.literal
+#          ^ punctuation.definition.string.begin
+#                     ^ punctuation.definition.string.end
 str1 = """
-#      ^^^ string.quoted.triple.basic.block
+#      ^^^ string.quoted.triple.basic.block punctuation.definition.string.begin
 Roses are red
 #^^^^^^^^^^^^^ string.quoted.triple.basic.block
 Violets are blue"""
-#^^^^^^^^^^^^^^^^^^ string.quoted.triple.basic.block
+#^^^^^^^^^^^^^^^ string.quoted.triple.basic.block
+#               ^^^ string.quoted.triple.basic.block punctuation.definition.string.end
 str2 = """
-#      ^^^ string.quoted.triple.basic.block
+#      ^^^ string.quoted.triple.basic.block punctuation.definition.string.begin
 The quick brown \
 #^^^^^^^^^^^^^^^^^ string.quoted.triple.basic.block
 
   fox jumps over \
     the lazy dog."""
-#^^^^^^^^^^^^^^^^^^^ string.quoted.triple.basic.block
+#^^^^^^^^^^^^^^^^ string.quoted.triple.basic.block
+#                ^^^ string.quoted.triple.basic.block punctuation.definition.string.end
 str3 = """\
-#      ^^^^^ string.quoted.triple.basic.block
+#      ^^^ string.quoted.triple.basic.block punctuation.definition.string.begin
+#         ^^ string.quoted.triple.basic.block
        The quick brown \
 #^^^^^^^^^^^^^^^^^^^^^^^^ string.quoted.triple.basic.block
        fox jumps over \
        the lazy dog.\
        """
-#      ^^^ string.quoted.triple.basic.block
+#      ^^^ string.quoted.triple.basic.block punctuation.definition.string.end
 s = """\b\t\n\f\r\"\\\u1234\U12345678"""
-#   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ string.quoted.triple.basic.block
+#   ^^^ string.quoted.triple.basic.block punctuation.definition.string.begin
+#      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ string.quoted.triple.basic.block constant.character.escape
+#                                    ^^^ string.quoted.triple.basic.block punctuation.definition.string.end
 s = """"""
-#   ^^^^^^ string.quoted.triple.basic.block
+#   ^^^ string.quoted.triple.basic.block punctuation.definition.string.begin
+#      ^^^ string.quoted.triple.basic.block punctuation.definition.string.end
 regex2 = '''I [dw]on't need \d{2} apples'''
-#        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ string.quoted.triple.literal.block
+#        ^^^ string.quoted.triple.literal.block punctuation.definition.string.begin
+#           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ string.quoted.triple.literal.block
+#                                       ^^^ string.quoted.triple.literal.block punctuation.definition.string.end
 lines  = '''
-#        ^^^^ string.quoted.triple.literal.block
+#        ^^^ string.quoted.triple.literal.block punctuation.definition.string.begin
 The first newline is
 #^^^^^^^^^^^^^^^^^^^^ string.quoted.triple.literal.block
 trimmed in raw strings.
    All other whitespace
    is preserved.
 '''
-#^^ string.quoted.triple.literal.block
+#^^ string.quoted.triple.literal.block punctuation.definition.string.end
 s = ''''''
-#   ^^^^^^ string.quoted.triple.literal.block
+#   ^^^ string.quoted.triple.literal.block punctuation.definition.string.begin
+#      ^^^ string.quoted.triple.literal.block punctuation.definition.string.end
 
 #-----------------------------------------------------------------------------
 # Invalid string
 #-----------------------------------------------------------------------------
 s = "
-#   ^ invalid.illegal
+#    ^ invalid.illegal.string.non-terminated
+s = "\a\x12"
+#    ^^^^ invalid.illegal.string.escape
+s = "\u"
+#    ^^ invalid.illegal.string.escape
+s = "\u1"
+#    ^^ invalid.illegal.string.escape
+s = "\uasdf"
+#    ^^ invalid.illegal.string.escape
+s = "\U"
+#    ^^ invalid.illegal.string.escape
+s = "\U1234"
+#    ^^ invalid.illegal.string.escape
 s = '
 #   ^ invalid.illegal
 s = '' true
 #     ^^^^^ invalid.illegal
-
-# Erroneously accepted:
+# These are erroneously accepted:
 s = ''''''''''''
-#   ^^^^^^^^^^^^ string.quoted.triple.literal.block
+#   ^^^ string.quoted.triple.literal.block punctuation.definition.string.begin
+#      ^^^ string.quoted.triple.literal.block punctuation.definition.string.end
+#         ^^^ string.quoted.triple.literal.block punctuation.definition.string.begin
+#            ^^^ string.quoted.triple.literal.block punctuation.definition.string.end
 s = """"""""
-#   ^^^^^^ string.quoted.triple.basic.block
-#         ^^ string.quoted.single.basic.line
+#   ^^^ string.quoted.triple.basic.block punctuation.definition.string.begin
+#      ^^^ string.quoted.triple.basic.block punctuation.definition.string.end
+#         ^ string.quoted.double.basic punctuation.definition.string.begin
+#          ^ string.quoted.double.basic punctuation.definition.string.end
+
 
 ##############################################################################
 # Array
@@ -458,9 +507,9 @@ arr1 = [ 1, 2, 3 ] # Comment
 #                  ^^^^^^^^^ comment.line.number-sign
 arr2 = [ "red", "yellow", "green" ]
 #      ^ punctuation.definition.array
-#        ^^^^^ string.quoted.single.basic.line
-#               ^^^^^^^^ string.quoted.single.basic.line
-#                          ^^^^^^ string.quoted.single.basic.line
+#        ^^^^^ string.quoted.double.basic
+#               ^^^^^^^^ string.quoted.double.basic
+#                         ^^^^^^^ string.quoted.double.basic
 #                                 ^ punctuation.definition.array
 arr3 = [ [ 1, 2 ], [3, 4, 5] ]
 #      ^ punctuation.definition.array
@@ -475,8 +524,8 @@ arr3 = [ [ 1, 2 ], [3, 4, 5] ]
 #                          ^ punctuation.definition.array
 #                            ^ punctuation.definition.array
 arr4 = [ "all", 'strings', """are the same""", '''type''']
-#        ^^^^^ string.quoted.single.basic.line
-#               ^^^^^^^^^ string.quoted.single.literal.line
+#        ^^^^^ string.quoted.double.basic
+#               ^^^^^^^^^ string.quoted.single.literal
 #                          ^^^^^^^^^^^^^^^^^^ string.quoted.triple.basic.block
 #                                              ^^^^^^^^^^ string.quoted.triple.literal.block
 #                                                        ^ punctuation.definition.array
@@ -511,8 +560,8 @@ arr6 = [ 1, 2.0, true, 1999-12-31,
 #        ^ constant.numeric.integer
 #           ^^^ constant.numeric.float
         's', "s", '''s''', """s""",
-#       ^^^ string.quoted.single.literal.line
-#            ^^^ string.quoted.single.basic.line
+#       ^^^ string.quoted.single.literal
+#            ^^^ string.quoted.double.basic
 #                 ^^^^^^^ string.quoted.triple.literal.block
 #                          ^^^^^^^ string.quoted.triple.basic.block
         [], {},
@@ -522,7 +571,7 @@ arr6 = [ 1, 2.0, true, 1999-12-31,
 # <- punctuation.definition.array
 a = ["s" asdf]
 #   ^ punctuation.definition.array
-#    ^^^ string.quoted.single.basic.line
+#    ^^^ string.quoted.double.basic
 #            ^ punctuation.definition.array
 
 a = [,]
@@ -557,10 +606,10 @@ name = { first = "Tom", last = "Preston-Werner" }
 #^^^ keyword.key
 #        ^^^^^ keyword.key
 #              ^ punctuation.definition.keyValuePair
-#                ^^^^^ string.quoted.single.basic.line
+#                ^^^^^ string.quoted.double.basic
 #                       ^^^^ keyword.key
 #                            ^ punctuation.definition.keyValuePair
-#                              ^^^^^^^^^^^^^^^^ string.quoted.single.basic.line
+#                              ^^^^^^^^^^^^^^^^ string.quoted.double.basic
 #                                               ^ punctuation.definition.inlinetable
 point = { x = 1, y = 2 }
 #       ^ punctuation.definition.inlinetable
@@ -587,10 +636,10 @@ t = {b=true, i=1, f=1.0, dt=1979-05-27T07:32:00Z, s1='s', s2="s", s3='''s''', s4
 #                           ^^^^^^^^^^^^^^^^^^^^ constant.other.datetime
 #                                                 ^^ keyword.key
 #                                                   ^ punctuation.definition.keyValuePair
-#                                                    ^^^ string.quoted.single.literal.line
+#                                                    ^^^ string.quoted.single.literal
 #                                                         ^^ keyword.key
 #                                                           ^ punctuation.definition.keyValuePair
-#                                                            ^^^ string.quoted.single.basic.line
+#                                                            ^^^ string.quoted.double.basic
 #                                                                 ^^ keyword.key
 #                                                                   ^ punctuation.definition.keyValuePair
 #                                                                    ^^^^^^^ string.quoted.triple.literal.block

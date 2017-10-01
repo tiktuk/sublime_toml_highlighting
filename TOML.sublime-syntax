@@ -112,25 +112,59 @@ contexts:
 
   string:
     - match: "'''"
-      comment: literal string block (no escape sequences)
+      # multi-line literal string (no escape sequences)
+      scope: punctuation.definition.string.begin.toml
       push:
         - meta_scope: string.quoted.triple.literal.block.toml
         - match: "'''"
+          scope: punctuation.definition.string.end.toml
           pop: true
-    - match: "'.*?'"
-      comment: literal string line (no escape sequences)
-      scope: string.quoted.single.literal.line.toml
     - match: '"""'
-      comment: basic string block
+      # multi-line basic string
+      scope: punctuation.definition.string.begin.toml
       push:
         - meta_scope: string.quoted.triple.basic.block.toml
         - match: '"""'
+          scope: punctuation.definition.string.end.toml
           pop: true
-        - match: '[^"\\]*(?:\\.?[^"\\]*)*'
-          scope: string.quoted.triple.basic.block.toml
-    - match: '"[^"\\]*(?:\\.[^"\\]*)*"'
-      comment: basic string line
-      scope: string.quoted.single.basic.line.toml
+        - include: string-escape
+    - match: '"'
+      # basic string
+      scope: punctuation.definition.string.begin.toml
+      push:
+        - meta_scope: string.quoted.double.basic.toml
+        - include: basic-string
+    - include: literal-string
+
+  basic-string:
+    # I unfortunately can't get the basic-string context to work where it
+    # matches the beginning quote, and retain the meta_scope of the
+    # surrounding context because "set" pops the scope off.  So users of
+    # basic-string should match the beginning quote, and then set up their
+    # desired scopes manually.
+    - meta_scope: string.quoted.double.basic.toml
+    - include: string-escape
+    - match: '"'
+      scope: punctuation.definition.string.end.toml
+      pop: true
+    - match: '\n'
+      scope: invalid.illegal.string.non-terminated.toml
+      pop: true
+
+  string-escape:
+    - match: '\\(?:[btnfr"\\]|u\h{4}|U\h{8})'
+      scope: constant.character.escape.toml
+    - match: '\\.'
+      scope: invalid.illegal.string.escape.toml
+
+  literal-string:
+    - match: '('')[^'']*('')'
+      # There is ambiguity in what is allowed in a literal string.
+      # See: https://github.com/toml-lang/toml/issues/473
+      scope: string.quoted.single.literal.toml
+      captures:
+        1: punctuation.definition.string.begin.toml
+        2: punctuation.definition.string.end.toml
 
   array:
     - match: '(?<!\w)(\[)\s*'
