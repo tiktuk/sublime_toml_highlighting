@@ -10,6 +10,12 @@ file_extensions:
 scope: source.toml
 
 variables:
+  ws: '[ \t]*'
+  wsnl: '[ \t\n]*'
+
+  # Used to detect the possible start of a key.
+  peek_key_start: '(?=[A-Za-z0-9_''"-])'
+
   # integer = [ "-" / "+" ] int
   # int = DIGIT / digit1-9 1*( DIGIT / "_" DIGIT )
   integer: '([\+\-]?) (?: [0-9] | [1-9] (?: [0-9] | _ [0-9] )+ )'
@@ -55,9 +61,11 @@ variables:
 
 contexts:
   main:
+    - match: '^{{ws}}'
+      # Ignore leading whitespace for all expressions.
     - include: comments
     - include: tables
-    - include: keys
+    - include: keyval
     - include: illegal
 
   illegal:
@@ -67,30 +75,39 @@ contexts:
         1: invalid.illegal.toml
 
   comments:
-    - match: \s*((#).*)$
+    - match: '{{ws}}((#).*)'
       captures:
         1: comment.line.number-sign.toml
         2: punctuation.definition.comment.toml
 
   data-types:
-    - include: inlinetable
+    - include: inline-table
     - include: array
     - include: string
     - include: date-time
     - include: float
     - include: integer
     - include: boolean
+    - match: '{{ws}}$'
+      # Don't show an incomplete line as invalid to avoid frequent red
+      # highlighting while typing.
+      pop: true
+    - match: '\w+|.'
+      scope: invalid.illegal.value.toml
+      pop: true
 
   boolean:
-    - match: (?<!\w)(true|false)(?!\w)
+    - match: (true|false)
       captures:
         1: constant.language.toml
+      pop: true
 
   integer:
     - match: '(?x) (?<!\w) {{integer}} (?!\w)'
       captures:
         0: constant.numeric.integer.toml
         1: keyword.operator.arithmetic.toml
+      pop: true
 
   float:
     # float = integer ( frac / ( frac exp ) / exp )
@@ -105,16 +122,18 @@ contexts:
       captures:
         0: constant.numeric.float.toml
         1: keyword.operator.arithmetic.toml
+      pop: true
 
   date-time:
     - match: '(?x) {{date_time}}'
       scope: constant.other.datetime.toml
+      pop: true
 
   string:
     - match: "'''"
       # multi-line literal string (no escape sequences)
       scope: punctuation.definition.string.begin.toml
-      push:
+      set:
         - meta_scope: string.quoted.triple.literal.block.toml
         - match: "'''"
           scope: punctuation.definition.string.end.toml
@@ -122,7 +141,7 @@ contexts:
     - match: '"""'
       # multi-line basic string
       scope: punctuation.definition.string.begin.toml
-      push:
+      set:
         - meta_scope: string.quoted.triple.basic.block.toml
         - match: '"""'
           scope: punctuation.definition.string.end.toml
@@ -131,7 +150,7 @@ contexts:
     - match: '"'
       # basic string
       scope: punctuation.definition.string.begin.toml
-      push:
+      set:
         - meta_scope: string.quoted.double.basic.toml
         - include: basic-string
     - include: literal-string
@@ -165,58 +184,137 @@ contexts:
       captures:
         1: punctuation.definition.string.begin.toml
         2: punctuation.definition.string.end.toml
+      pop: true
 
   array:
-    - match: '(?<!\w)(\[)\s*'
-      comment: Array
-      captures:
-        1: punctuation.definition.array.toml
-      push:
-        - match: '\s*(\])(?!\w)'
-          captures:
-            1: punctuation.definition.array.toml
-          pop: true
-        - include: comments
-        - include: data-types
+    - match: '\['
+      scope: punctuation.definition.array.begin.toml
+      set: [maybe-empty-array, maybe-array-comments]
 
-  inlinetable:
-    - match: '(?<!\w)(\{)\s*'
-      captures:
-        1: punctuation.definition.inlinetable.toml
-      push:
-        - match: '\s*(\})(?!\w)'
-          captures:
-            1: punctuation.definition.inlinetable.toml
-          pop: true
-        - include: keys
-        - include: data-types
+  maybe-empty-array:
+    - match: ']'
+      scope: punctuation.definition.array.end.toml
+      pop: true
+    - match: ''
+      set: [array-sep, data-types]
 
-  keys:
-    - match: (\s*=.*)$
-      comment: Assignments without key are invalid
-      scope: invalid.illegal.noKeyDefined.toml
-    - match: '(\s*[A-Za-z_\-][A-Za-z0-9_\-]*\s*=)(?=\s*$)'
-      comment: Assignments without value are unusual
-      scope: invalid.deprecated.noValueGiven.toml
-    - match: '\s*([A-Za-z_-][A-Za-z0-9_-]*|".+"|''.+''|[0-9]+)\s*(=)\s*'
-      captures:
-        1: keyword.key.toml
-        2: punctuation.definition.keyValuePair.toml
-      push:
-        - match: '($|(?==)|\,|\s*(?=\}))'
-          pop: true
+  array-sep:
+    - match: '{{wsnl}}'
+    - include: comments
+    - match: ']'
+      scope: punctuation.definition.array.end.toml
+      pop: true
+    - match: ','
+      scope: punctuation.separator.array.toml
+      set:
+        - match: '{{wsnl}}'
         - include: comments
-        - include: data-types
-        - include: illegal
+        - match: ']'
+          scope: punctuation.definition.array.end.toml
+          pop: true
+        - match: '(?=[^\n])'
+          set: [array-sep, data-types]
+    - match: '\w+|.'
+      scope: invalid.illegal.array.toml
+
+  maybe-array-comments:
+    - match: '{{wsnl}}'
+    - include: comments
+    - match: '(?=[^\n])'
+      pop: true
+
+  inline-table:
+    - match: '\{'
+      scope: punctuation.definition.inline-table.begin.toml
+      set:
+        - match: '{{ws}}'
+        - match: '\}'
+          # Empty table.
+          scope: punctuation.definition.inline-table.end.toml
+          pop: true
+        - match: ''
+          set: [inline-keyval-sep, key]
+
+  inline-keyval-sep:
+    - match: '{{ws}}(=){{ws}}'
+      captures:
+        1: punctuation.definition.key-value.toml
+      set: [inline-table-keyvals, data-types]
+    - match: '(?=\w+|.)'
+      scope: invalid.illegal.inline-sep.toml
+      pop: true
+
+  inline-table-keyvals:
+    - match: '{{ws}}'
+    - match: '\}'
+      scope: punctuation.definition.inline-table.end.toml
+      pop: true
+    - match: ','
+      scope: punctuation.separator.inline-table.toml
+      set:
+        - match: '{{ws}}'
+        - match: ''
+          set: [inline-keyval-sep, key]
+    - match: '(?=\w+|.)'
+      scope: invalid.illegal.inline-key.toml
+      pop: true
+
+  keyval:
+    - match: '{{peek_key_start}}'
+      push: [keyval-sep, key]
+
+  keyval-sep:
+    - match: '{{ws}}(=){{ws}}'
+      captures:
+        # This could arguably be keyword.operator.assignment.toml, but since
+        # Monokai uses the same color for non-C sources with entity.name.tag,
+        # it doesn't have the appropriate visual distinction.
+        1: punctuation.definition.key-value.toml
+      set: [maybe-comment-eol, data-types]
+    - match: '{{ws}}$'
+      # Don't show an incomplete line as invalid to avoid flickering.
+      pop: true
+    - match: '.+$'
+      scope: invalid.illegal.keyval.toml
+      pop: true
+
+  key:
+    - meta_scope: entity.name.tag.toml
+    - include: key-noscope
+
+  key-noscope:
+    - match: '[A-Za-z0-9_-]+'
+      # unquoted-key
+      pop: true
+    - match: '"'
+      scope: punctuation.definition.string.begin.toml
+      set:
+        - meta_scope: entity.name.tag.toml string.quoted.double.basic.toml
+        - include: basic-string
+    - include: literal-string
+    - match: '.'
+      scope: invalid.illegal.key.toml
+      pop: true
+
+  maybe-comment-eol:
+    - include: comments
+    - match: '$'
+      pop: true
+    - match: '.+'
+      # This also highlights trailing whitespece.  Although that is valid
+      # TOML, it doesn't seem bad to me.  If that's annoying, change this
+      # to '[^ \n]+'.
+      scope: invalid.illegal.trailing.toml
+      pop: true
 
   tables:
-    - match: '^\s*(\[\[\]\]|\[\[\..*\]\]|\[\[.*\.\]\]|\[\[.*\.\..*\]\]|\[\[.*[\[\]#].*\]\]|\[\[.*\]\].+\n)'
+    - match: '\s*(\[\[\]\]|\[\[\..*\]\]|\[\[.*\.\]\]|\[\[.*\.\..*\]\]|\[\[.*[\[\]#].*\]\]|\[\[.*\]\].+\n)'
       comment: non-empty etc. like tables, see below!
       push:
         - meta_scope: invalid.illegal.table.array.toml
-        - match: '(?=^\s*\[?\[.*\]\]?)'
+        - match: '(?=\s*\[?\[.*\]\]?)'
           pop: true
-    - match: '^\s*(\[\[)([A-Za-z_\-][A-Za-z0-9_\-\.]*)(\]\])\s*'
+    - match: '\s*(\[\[)([A-Za-z_\-][A-Za-z0-9_\-\.]*)(\]\])\s*'
       comment: A named TOML-Table-Array
       captures:
         1: punctuation.definition.table.array.toml
@@ -224,18 +322,18 @@ contexts:
         3: punctuation.definition.table.array.toml
       push:
         - meta_scope: meta.tag.table.array.toml
-        - match: '(?=^\s*\[?\[[A-Za-z_\-][A-Za-z0-9_\-\.]*\]\]?)'
+        - match: '(?=\s*\[?\[[A-Za-z_\-][A-Za-z0-9_\-\.]*\]\]?)'
           pop: true
         - include: comments
         - include: keys
         - include: illegal
-    - match: '^\s*(\[\]|\[\..*\]|\[.*\.\]|\[.*\.\..*\]|\[.*[\[\]#].*\]|\[.*\].+\n)'
+    - match: '\s*(\[\]|\[\..*\]|\[.*\.\]|\[.*\.\..*\]|\[.*[\[\]#].*\]|\[.*\].+\n)'
       comment: 'Each table name segment must be non-empty, must not contain the characters ''['', '']'' or ''#'' and is delimited by a ''.''.  Tables "appear in square brackets *on a line by themselves*"'
       push:
         - meta_scope: invalid.illegal.table.toml
-        - match: '(?=^\s*\[?\[.*\]\]?)'
+        - match: '(?=\s*\[?\[.*\]\]?)'
           pop: true
-    - match: '^\s*(\[)([A-Za-z_\-][A-Za-z0-9_\-\.]*)(\])\s*'
+    - match: '\s*(\[)([A-Za-z_\-][A-Za-z0-9_\-\.]*)(\])\s*'
       comment: A named TOML-Table
       captures:
         1: punctuation.definition.table.toml
@@ -243,7 +341,7 @@ contexts:
         3: punctuation.definition.table.toml
       push:
         - meta_scope: meta.tag.table.toml
-        - match: '(?=^\s*\[?\[[A-Za-z_\-][A-Za-z0-9_\-\.]*\]\]?)'
+        - match: '(?=\s*\[?\[[A-Za-z_\-][A-Za-z0-9_\-\.]*\]\]?)'
           pop: true
         - include: comments
         - include: keys

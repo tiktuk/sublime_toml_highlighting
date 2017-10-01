@@ -97,87 +97,98 @@
 # Keys
 ##############################################################################
  key = 123 # Comment
-#<- -keyword.key
-#^^^ keyword.key
-#    ^ punctuation.definition.keyValuePair
+#<- -entity.name.tag
+#^^^ entity.name.tag
+#   ^-entity.name.tag
+#    ^ punctuation.definition.key-value
 #      ^^^ constant.numeric.integer
-#          ^ comment.line.number-sign punctuation.definition.comment
+#          ^ punctuation.definition.comment
 #          ^^^^^^^^^ comment.line.number-sign
 nospace=123
-#<- keyword.key
-#^^^^^^ keyword.key
-#      ^ punctuation.definition.keyValuePair
+#<- entity.name.tag
+#^^^^^^ entity.name.tag
+#      ^ punctuation.definition.key-value
 #       ^^^ constant.numeric.integer
  'key' = 123
-#^^^^^ keyword.key
-#      ^ punctuation.definition.keyValuePair
-#        ^^^ constant.numeric.integer
+#^ punctuation.definition.string.begin
+#^^^^^entity.name.tag string.quoted.single.literal
+#    ^ punctuation.definition.string.end
+#      ^ punctuation.definition.key-value
  "key" = 123
-#^^^^^ keyword.key
-#      ^ punctuation.definition.keyValuePair
-#        ^^^ constant.numeric.integer
+#^ punctuation.definition.string.begin
+#^^^^^entity.name.tag string.quoted.double.basic
+#    ^ punctuation.definition.string.end
+#      ^ punctuation.definition.key-value
  "key\b\t\n\f\r\"\\\u1234\U12345678" = 123
-#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ keyword.key
-#                                    ^ punctuation.definition.keyValuePair
-#                                      ^^^ constant.numeric.integer
+#^ punctuation.definition.string.begin
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ entity.name.tag string.quoted.double.basic
+#    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ entity.name.tag string.quoted.double.basic constant.character.escape
+#                                  ^ punctuation.definition.string.end
+#                                    ^ punctuation.definition.key-value
 'quoted "value"' = "value"
-#<- keyword.key
-#^^^^^^^^^^^^^^^ keyword.key
-#                ^ punctuation.definition.keyValuePair
+#<- entity.name.tag string.quoted.single.literal punctuation.definition.string.begin
+#^^^^^^^^^^^^^^^ entity.name.tag string.quoted.single.literal
+#              ^ punctuation.definition.string.end
+#                ^ punctuation.definition.key-value
 #                  ^ punctuation.definition.string.begin
 #                  ^^^^^^^ string.quoted.double.basic
-#                        ^ punctuation.definition.string.end
  123 = 123
-#^^^ keyword.key
-#    ^ punctuation.definition.keyValuePair
+#^^^ entity.name.tag
+#    ^ punctuation.definition.key-value
 #      ^^^ constant.numeric.integer
+
+#-----------------------------------------------------------------------------
+# Invalid but accepted keys
+#-----------------------------------------------------------------------------
+# Incomplete key/values are not marked as invalid to avoid frequent red
+# highlighting while typing.
+ key
+#^^^ entity.name.tag -invalid
+ key =
+#^^^ entity.name.tag -invalid
+#   ^^^ -invalid
+#    ^ punctuation.definition.key-value
+ key =
+ 1
+#^ entity.name.tag
 
 #-----------------------------------------------------------------------------
 # Invalid keys
 #-----------------------------------------------------------------------------
- key
-#^^^ invalid.illegal
- key =
-#^^^^^ invalid.deprecated.noValueGiven
- key =
- 1
-#^ invalid.illegal
 key key
-#^^^^^^ invalid.illegal
+#  ^^^^ invalid.illegal
 key key = 1
-#^^^^^^^^^^ invalid.illegal
+#  ^^^^^^^^ invalid.illegal
  '
 #^ invalid.illegal
  'key
 #^^^^ invalid.illegal
  "
-#^ invalid.illegal
+# ^ invalid.illegal
  "key
-#^^^^ invalid.illegal
+#    ^ invalid.illegal
  key.,!@$%^&**&()
-#^^^^^^^^^^^^^^^^ invalid.illegal
+#   ^^^^^^^^^^^^^ invalid.illegal
  !@$%^&*()
 #^^^^^^^^^ invalid.illegal
  =
-#^ invalid.illegal.noKeyDefined
+#^ invalid.illegal
  = 123
-#^^^^^ invalid.illegal.noKeyDefined
+#^^^^^ invalid.illegal
+
 
 ##############################################################################
 # Invalid values
 ##############################################################################
 key = value
+#   ^ punctuation.definition.key-value
 #     ^^^^^ invalid.illegal
-# This is erroneously accepted:
 key = 123'asdf'
-#^^ keyword.key
-#   ^ punctuation.definition.keyValuePair
-#     ^^^ constant.numeric.integer
-#        ^^^^^^ string.quoted.single.literal
+#        ^^^^^^ invalid.illegal
 key# comment
-#^^^^^^^^^^^ invalid.illegal
+#  ^^^^^^^^^ invalid.illegal
 key = = 1
-#     ^^^ invalid.illegal.noKeyDefined
+#     ^^^ invalid.illegal
 a = 1 b = 2
 #    ^^^^^^ invalid.illegal
 
@@ -194,9 +205,9 @@ key = false # COMMENT
 # Invalid boolean
 #-----------------------------------------------------------------------------
 key = truefalse
-#     ^^^^^^^^^ invalid.illegal
+#         ^^^^^ invalid.illegal
 key = true123
-#     ^^^^^^^ invalid.illegal
+#         ^^^ invalid.illegal
 key = true!
 #         ^ invalid.illegal
 
@@ -461,226 +472,254 @@ s = '
 #   ^ invalid.illegal
 s = '' true
 #     ^^^^^ invalid.illegal
-# These are erroneously accepted:
 s = ''''''''''''
-#   ^^^ string.quoted.triple.literal.block punctuation.definition.string.begin
-#      ^^^ string.quoted.triple.literal.block punctuation.definition.string.end
-#         ^^^ string.quoted.triple.literal.block punctuation.definition.string.begin
-#            ^^^ string.quoted.triple.literal.block punctuation.definition.string.end
+#         ^^^^^^ invalid.illegal
 s = """"""""
-#   ^^^ string.quoted.triple.basic.block punctuation.definition.string.begin
-#      ^^^ string.quoted.triple.basic.block punctuation.definition.string.end
-#         ^ string.quoted.double.basic punctuation.definition.string.begin
-#          ^ string.quoted.double.basic punctuation.definition.string.end
+#         ^^ invalid.illegal
 
 
 ##############################################################################
 # Array
 ##############################################################################
 empty = [] # Comment
-#       ^^ punctuation.definition.array
+#       ^ punctuation.definition.array.begin
+#        ^ punctuation.definition.array.end
 #          ^^^^^^^^^ comment.line.number-sign
 empty = [
-#       ^ punctuation.definition.array
+#       ^ punctuation.definition.array.begin
 # Interior comment
 #^^^^^^^^^^^^^^^^^ comment.line.number-sign
 ]
-#<- punctuation.definition.array
+#<- punctuation.definition.array.end
 
 a = [ # Comment
 #     ^^^^^^^^^ comment.line.number-sign
-#   ^ punctuation.definition.array
+#   ^ punctuation.definition.array.begin
 
   1,
 # ^ constant.numeric.integer
-#  ^^ source.toml
+#  ^ punctuation.separator.array
 
 ]
-#<- punctuation.definition.array
+#<- punctuation.definition.array.end
 
 arr1 = [ 1, 2, 3 ] # Comment
-#      ^ punctuation.definition.array
+#      ^ punctuation.definition.array.begin
 #        ^ constant.numeric.integer
+#         ^ punctuation.separator.array
 #           ^ constant.numeric.integer
+#            ^ punctuation.separator.array
 #              ^ constant.numeric.integer
-#                ^ punctuation.definition.array
+#                ^ punctuation.definition.array.end
 #                  ^^^^^^^^^ comment.line.number-sign
 arr2 = [ "red", "yellow", "green" ]
-#      ^ punctuation.definition.array
+#      ^ punctuation.definition.array.begin
 #        ^^^^^ string.quoted.double.basic
+#             ^ punctuation.separator.array
 #               ^^^^^^^^ string.quoted.double.basic
 #                         ^^^^^^^ string.quoted.double.basic
-#                                 ^ punctuation.definition.array
+#                                 ^ punctuation.definition.array.end
 arr3 = [ [ 1, 2 ], [3, 4, 5] ]
-#      ^ punctuation.definition.array
-#        ^ punctuation.definition.array
+#      ^ punctuation.definition.array.begin
+#        ^ punctuation.definition.array.begin
 #          ^ constant.numeric.integer
+#           ^ punctuation.separator.array
 #             ^ constant.numeric.integer
-#               ^ punctuation.definition.array
-#                  ^ punctuation.definition.array
+#               ^ punctuation.definition.array.end
+#                ^ punctuation.separator.array
+#                  ^ punctuation.definition.array.begin
 #                   ^ constant.numeric.integer
+#                    ^ punctuation.separator.array
 #                      ^ constant.numeric.integer
+#                       ^ punctuation.separator.array
 #                         ^ constant.numeric.integer
-#                          ^ punctuation.definition.array
-#                            ^ punctuation.definition.array
+#                          ^ punctuation.definition.array.end
+#                            ^ punctuation.definition.array.end
 arr4 = [ "all", 'strings', """are the same""", '''type''']
 #        ^^^^^ string.quoted.double.basic
 #               ^^^^^^^^^ string.quoted.single.literal
 #                          ^^^^^^^^^^^^^^^^^^ string.quoted.triple.basic.block
 #                                              ^^^^^^^^^^ string.quoted.triple.literal.block
-#                                                        ^ punctuation.definition.array
+#                                                        ^ punctuation.definition.array.end
 arr5 = [ [ 1, 2 ], ["a", "b", "c"] ]
-#      ^ punctuation.definition.array
-#        ^ punctuation.definition.array
-#               ^ punctuation.definition.array
-#                  ^ punctuation.definition.array
-#                                ^ punctuation.definition.array
-#                                  ^ punctuation.definition.array
+#      ^ punctuation.definition.array.begin
+#        ^ punctuation.definition.array.begin
+#               ^ punctuation.definition.array.end
+#                ^ punctuation.separator.array
+#                  ^ punctuation.definition.array.begin
+#                                ^ punctuation.definition.array.end
+#                                  ^ punctuation.definition.array.end
 arr7 = [
-#      ^ punctuation.definition.array
+#      ^ punctuation.definition.array.begin
   1, 2, 3
 # ^ constant.numeric.integer
+#  ^ punctuation.separator.array
 ]
-#<- punctuation.definition.array
+#<- punctuation.definition.array.end
 arr8 = [
   1,
 # ^ constant.numeric.integer
+#  ^ punctuation.separator.array
   2, # this is ok
 # ^ constant.numeric.integer
+#  ^ punctuation.separator.array
 #    ^^^^^^^^^^^^ comment.line.number-sign
 ]
-# <- punctuation.definition.array
+# <- punctuation.definition.array.end
 
 #-----------------------------------------------------------------------------
 # Invalid array (but accepted)
 #-----------------------------------------------------------------------------
 # Mixed types aren't allowed.
 arr6 = [ 1, 2.0, true, 1999-12-31,
-#      ^ punctuation.definition.array
+#      ^ punctuation.definition.array.begin
 #        ^ constant.numeric.integer
+#         ^ punctuation.separator.array
 #           ^^^ constant.numeric.float
         's', "s", '''s''', """s""",
 #       ^^^ string.quoted.single.literal
+#          ^ punctuation.separator.array
 #            ^^^ string.quoted.double.basic
+#               ^ punctuation.separator.array
 #                 ^^^^^^^ string.quoted.triple.literal.block
+#                        ^ punctuation.separator.array
 #                          ^^^^^^^ string.quoted.triple.basic.block
+#                                 ^ punctuation.separator.array
         [], {},
 #       ^^ punctuation.definition.array
-#           ^^ punctuation.definition.inlinetable
+#         ^ punctuation.separator.array
+#           ^ punctuation.definition.inline-table.begin
+#            ^ punctuation.definition.inline-table.end
+#             ^ punctuation.separator.array
 ]
-# <- punctuation.definition.array
+# <- punctuation.definition.array.end
 a = ["s" asdf]
-#   ^ punctuation.definition.array
+#   ^ punctuation.definition.array.begin
 #    ^^^ string.quoted.double.basic
-#            ^ punctuation.definition.array
+#        ^^^^ invalid.illegal.array
+#            ^ punctuation.definition.array.end
 
+#-----------------------------------------------------------------------------
+# Invalid array
+#-----------------------------------------------------------------------------
 a = [,]
-#   ^ punctuation.definition.array
-#     ^ punctuation.definition.array
+#   ^ punctuation.definition.array.begin
+#    ^ invalid.illegal
+#     ^ punctuation.definition.array.end
 a = [1,,2]
-#       ^ constant.numeric.integer
-#        ^ punctuation.definition.array
+#     ^ punctuation.separator.array
+#      ^ invalid.illegal.value
+#        ^ punctuation.definition.array.end
 a = [&*^%$*]
-#   ^ punctuation.definition.array
-#          ^ punctuation.definition.array
+#   ^ punctuation.definition.array.begin
+#    ^ invalid.illegal.value
 a = [1, 2, name]
-#              ^ punctuation.definition.array
+#          ^^^^ invalid.illegal.value
+#              ^ punctuation.definition.array.end
 
 
 ##############################################################################
 # Inline Table
 ##############################################################################
 table = {  } # Comment
-#^^^^ keyword.key
-#     ^ punctuation.definition.keyValuePair
-#       ^ punctuation.definition.inlinetable
-#          ^ punctuation.definition.inlinetable
+#^^^^ entity.name.tag
+#     ^ punctuation.definition.key-value
+#       ^ punctuation.definition.inline-table.begin
+#          ^ punctuation.definition.inline-table.end
 #            ^^^^^^^^^ comment.line.number-sign
 table = {key = 123} # Comment
-#       ^ punctuation.definition.inlinetable
-#        ^^^ keyword.key
-#            ^ punctuation.definition.keyValuePair
-#                 ^ punctuation.definition.inlinetable
+#       ^ punctuation.definition.inline-table.begin
+#        ^^^ entity.name.tag
+#            ^ punctuation.definition.key-value
+#                 ^ punctuation.definition.inline-table.end
 #                   ^^^^^^^^^ comment.line.number-sign
 name = { first = "Tom", last = "Preston-Werner" }
-#^^^ keyword.key
-#        ^^^^^ keyword.key
-#              ^ punctuation.definition.keyValuePair
+#^^^ entity.name.tag
+#        ^^^^^ entity.name.tag
+#              ^ punctuation.definition.key-value
 #                ^^^^^ string.quoted.double.basic
-#                       ^^^^ keyword.key
-#                            ^ punctuation.definition.keyValuePair
+#                     ^ punctuation.separator.inline-table
+#                       ^^^^ entity.name.tag
+#                            ^ punctuation.definition.key-value
 #                              ^^^^^^^^^^^^^^^^ string.quoted.double.basic
-#                                               ^ punctuation.definition.inlinetable
+#                                               ^ punctuation.definition.inline-table.end
 point = { x = 1, y = 2 }
-#       ^ punctuation.definition.inlinetable
-#         ^ keyword.key
-#           ^ punctuation.definition.keyValuePair
+#       ^ punctuation.definition.inline-table.begin
+#         ^ entity.name.tag
+#           ^ punctuation.definition.key-value
 #             ^ constant.numeric.integer
-#                ^ keyword.key
-#                  ^ punctuation.definition.keyValuePair
+#              ^ punctuation.separator.inline-table
+#                ^ entity.name.tag
+#                  ^ punctuation.definition.key-value
 #                    ^ constant.numeric.integer
-#                      ^ punctuation.definition.inlinetable
+#                      ^ punctuation.definition.inline-table.end
 t = {b=true, i=1, f=1.0, dt=1979-05-27T07:32:00Z, s1='s', s2="s", s3='''s''', s4="""s""", a=[1], t={k=1}}
-#   ^ punctuation.definition.inlinetable
-#    ^ keyword.key
-#     ^ punctuation.definition.keyValuePair
+#   ^ punctuation.definition.inline-table.begin
+#    ^ entity.name.tag
+#     ^ punctuation.definition.key-value
 #      ^^^^ constant.language
-#            ^ keyword.key
-#             ^ punctuation.definition.keyValuePair
+#          ^ punctuation.separator.inline-table
+#            ^ entity.name.tag
+#             ^ punctuation.definition.key-value
 #              ^ constant.numeric.integer
-#                 ^ keyword.key
-#                  ^ punctuation.definition.keyValuePair
+#               ^ punctuation.separator.inline-table
+#                 ^ entity.name.tag
+#                  ^ punctuation.definition.key-value
 #                   ^^^ constant.numeric.float
-#                        ^^ keyword.key
-#                          ^ punctuation.definition.keyValuePair
+#                      ^ punctuation.separator.inline-table
+#                        ^^ entity.name.tag
+#                          ^ punctuation.definition.key-value
 #                           ^^^^^^^^^^^^^^^^^^^^ constant.other.datetime
-#                                                 ^^ keyword.key
-#                                                   ^ punctuation.definition.keyValuePair
+#                                               ^ punctuation.separator.inline-table
+#                                                 ^^ entity.name.tag
+#                                                   ^ punctuation.definition.key-value
 #                                                    ^^^ string.quoted.single.literal
-#                                                         ^^ keyword.key
-#                                                           ^ punctuation.definition.keyValuePair
+#                                                       ^ punctuation.separator.inline-table
+#                                                         ^^ entity.name.tag
+#                                                           ^ punctuation.definition.key-value
 #                                                            ^^^ string.quoted.double.basic
-#                                                                 ^^ keyword.key
-#                                                                   ^ punctuation.definition.keyValuePair
+#                                                               ^ punctuation.separator.inline-table
+#                                                                 ^^ entity.name.tag
+#                                                                   ^ punctuation.definition.key-value
 #                                                                    ^^^^^^^ string.quoted.triple.literal.block
-#                                                                             ^^ keyword.key
-#                                                                               ^ punctuation.definition.keyValuePair
+#                                                                           ^ punctuation.separator.inline-table
+#                                                                             ^^ entity.name.tag
+#                                                                               ^ punctuation.definition.key-value
 #                                                                                ^^^^^^^ string.quoted.triple.basic.block
-#                                                                                         ^ keyword.key
-#                                                                                          ^ punctuation.definition.keyValuePair
-#                                                                                           ^ punctuation.definition.array
+#                                                                                       ^ punctuation.separator.inline-table
+#                                                                                         ^ entity.name.tag
+#                                                                                          ^ punctuation.definition.key-value
+#                                                                                           ^ punctuation.definition.array.begin
 #                                                                                            ^ constant.numeric.integer
-#                                                                                             ^ punctuation.definition.array
-#                                                                                                ^ keyword.key
-#                                                                                                 ^ punctuation.definition.keyValuePair
-#                                                                                                  ^ punctuation.definition.inlinetable
-#                                                                                                   ^ keyword.key
-#                                                                                                    ^ punctuation.definition.keyValuePair
+#                                                                                             ^ punctuation.definition.array.end
+#                                                                                              ^ punctuation.separator.inline-table
+#                                                                                                ^ entity.name.tag
+#                                                                                                 ^ punctuation.definition.key-value
+#                                                                                                  ^ punctuation.definition.inline-table.begin
+#                                                                                                   ^ entity.name.tag
+#                                                                                                    ^ punctuation.definition.key-value
 #                                                                                                     ^ constant.numeric.integer
-#                                                                                                      ^^ punctuation.definition.inlinetable
-
-# Invalid but accepted:
-t = {,}
-#   ^ punctuation.definition.inlinetable
-#     ^ punctuation.definition.inlinetable
-t = {
-}
-#<- punctuation.definition.inlinetable
-t = {key=1,}
-#          ^ punctuation.definition.inlinetable
-t = {key}
-#       ^ punctuation.definition.inlinetable
-t = {key=1, asdf}
-#               ^ punctuation.definition.inlinetable
+#                                                                                                      ^^ punctuation.definition.inline-table.end
 
 #-----------------------------------------------------------------------------
 # Invalid inline table
 #-----------------------------------------------------------------------------
+t = {,}
+#    ^^ invalid.illegal
 t = {=}
 #    ^^ invalid.illegal
+t = {
+}  # comment to clear scope
+#<- invalid.illegal
+t = {key=1,}
+#          ^ invalid.illegal
+t = {key}
+#       ^ invalid.illegal
 t = {key=1 asdf}
 #          ^^^^^ invalid.illegal
+t = {key=1, asdf}
+#               ^ invalid.illegal
 t = {key=invalid}
-#        ^^^^^^^^ invalid.illegal
+#        ^^^^^^^ invalid.illegal.value
 t = {!=123}
-#     ^^^^^ invalid.illegal
+#    ^ invalid.illegal.key
