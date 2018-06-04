@@ -161,7 +161,6 @@ contexts:
     # surrounding context because "set" pops the scope off.  So users of
     # basic-string should match the beginning quote, and then set up their
     # desired scopes manually.
-    - meta_scope: string.quoted.double.basic.toml
     - include: string-escape
     - match: '"'
       scope: punctuation.definition.string.end.toml
