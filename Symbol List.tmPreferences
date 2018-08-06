@@ -5,7 +5,7 @@
 	<key>name</key>
 	<string>Symbol List</string>
 	<key>scope</key>
-	<string>source.toml entity.name</string>
+	<string>meta.tag.key.toml, meta.tag.table.toml</string>
 	<key>settings</key>
 	<dict>
 		<key>showInSymbolList</key>
