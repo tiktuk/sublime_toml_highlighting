@@ -17,10 +17,17 @@ variables:
 
   # Used to detect the possible start of a key.
   peek_key_start: '(?=[A-Za-z0-9_''"-])'
+  dot_peek_key: '{{ws}}(\.){{ws}}{{peek_key_start}}'
 
   # integer = [ "-" / "+" ] int
   # int = DIGIT / digit1-9 1*( DIGIT / "_" DIGIT )
   integer: '([\+\-]?) (?: [0-9] | [1-9] (?: [0-9] | _ [0-9] )+ )'
+
+  HEXDIG: '[0-9A-Fa-f]'
+  hex_int: '0x{{HEXDIG}}(?:{{HEXDIG}}|_{{HEXDIG}})*'
+  oct_int: '0o[0-7](?:[0-7]|_[0-7])*'
+  bin_int: '0b[0-1](?:[0-1]|_[0-1])*'
+
   # frac = "." DIGIT *( DIGIT / "_" DIGIT )
   frac: '\. [0-9] (?: [0-9] | _ [0-9] )*'
   # exp = ("e" / "E") integer
@@ -52,10 +59,10 @@ variables:
   full_date: '{{date_fullyear}} - {{date_month}} - {{date_mday}}'
   # full-time      = partial-time time-offset
   full_time: '{{partial_time}} {{time_offset}}'
-  # offset-date-time = full-date "T" full-time
-  offset_date_time: '{{full_date}} T {{full_time}}'
-  # local-date-time = full-date "T" partial-time
-  local_date_time: '{{full_date}} T {{partial_time}}'
+  # offset-date-time = full-date T|%20 full-time
+  offset_date_time: '{{full_date}} [T ] {{full_time}}'
+  # local-date-time = full-date T|%20 partial-time
+  local_date_time: '{{full_date}} [T ] {{partial_time}}'
   # local-date = full-date
   local_date: '{{full_date}}'
   # local-time = partial-time
@@ -105,7 +112,14 @@ contexts:
       pop: true
 
   integer:
-    - match: '(?x) (?<!\w) {{integer}} (?!\w)'
+    - match: |-
+        (?x)
+          (?<!\w)
+            {{hex_int}}
+            |{{oct_int}}
+            |{{bin_int}}
+            |{{integer}}
+          (?!\w)
       captures:
         0: constant.numeric.integer.toml
         1: keyword.operator.arithmetic.toml
@@ -121,6 +135,11 @@ contexts:
             {{integer}}
             (?: {{frac}} | (?: {{frac}} {{exp}} ) | {{exp}} )
           (?!\w)
+      captures:
+        0: constant.numeric.float.toml
+        1: keyword.operator.arithmetic.toml
+      pop: true
+    - match: '(?<!\w)([+-])?(inf|nan)(?!\w)'
       captures:
         0: constant.numeric.float.toml
         1: keyword.operator.arithmetic.toml
@@ -149,27 +168,21 @@ contexts:
           scope: punctuation.definition.string.end.toml
           pop: true
         - include: string-escape
-    - match: '"'
-      # basic string
-      scope: punctuation.definition.string.begin.toml
-      set:
-        - meta_scope: string.quoted.double.basic.toml
-        - include: basic-string
+    - include: basic-string
     - include: literal-string
 
   basic-string:
-    # I unfortunately can't get the basic-string context to work where it
-    # matches the beginning quote, and retain the meta_scope of the
-    # surrounding context because "set" pops the scope off.  So users of
-    # basic-string should match the beginning quote, and then set up their
-    # desired scopes manually.
-    - include: string-escape
     - match: '"'
-      scope: punctuation.definition.string.end.toml
-      pop: true
-    - match: '\n'
-      scope: invalid.illegal.string.non-terminated.toml
-      pop: true
+      scope: punctuation.definition.string.begin.toml
+      set:
+        - meta_scope: string.quoted.double.basic.toml
+        - include: string-escape
+        - match: '"'
+          scope: punctuation.definition.string.end.toml
+          pop: true
+        - match: '\n'
+          scope: invalid.illegal.string.non-terminated.toml
+          pop: true
 
   string-escape:
     - match: '\\(?:[btnfr"\\]|u\h{4}|U\h{8})'
@@ -280,19 +293,38 @@ contexts:
       pop: true
 
   key:
-    - meta_scope: entity.name.tag.toml
-    - include: key-noscope
-
-  key-noscope:
-    - match: '[A-Za-z0-9_-]+'
-      # unquoted-key
+    - meta_scope: meta.tag.key.toml
+    - match: '{{peek_key_start}}'
+      push: [maybe-dot-key, key-simple]
+    - match: '(?={{ws}}=)'
       pop: true
-    - match: '"'
-      scope: punctuation.definition.string.begin.toml
-      set:
-        - meta_scope: entity.name.tag.toml string.quoted.double.basic.toml
-        - include: basic-string
+    - match: '{{ws}}$'
+      # Early exit to avoid errors while typing.
+      pop: true
+    - match: '.'
+      scope: invalid.illegal.key.toml
+      pop: true
+
+  key-simple:
+    - match: '[A-Za-z0-9_-]+'
+      scope: entity.name.tag.toml
+      pop: true
+    - include: key-quoted
+    - match: '\S+'
+      scope: invalid.illegal.key.toml
+      pop: true
+
+  key-quoted:
+    - include: basic-string
     - include: literal-string
+
+  maybe-dot-key:
+    - match: '{{dot_peek_key}}'
+      captures:
+        1: punctuation.separator.key.toml
+      push: key-simple
+    - match: '(?={{ws}}(?:=|$))'
+      pop: true
     - match: '.'
       scope: invalid.illegal.key.toml
       pop: true
@@ -325,7 +357,7 @@ contexts:
       push: [maybe-comment-eol, table-name]
 
   table-name:
-    - meta_content_scope: entity.name.table.toml
+    - meta_content_scope: meta.tag.table.toml
     - match: '{{ws}}(\])'
       captures:
         1: punctuation.definition.table.end.toml
@@ -333,7 +365,7 @@ contexts:
     - include: table-name-inc
 
   table-array-name:
-    - meta_content_scope: entity.name.table.array.toml
+    - meta_content_scope: meta.tag.table.array.toml
     - match: '{{ws}}(\]\])'
       captures:
         1: punctuation.definition.table.array.end.toml
@@ -342,18 +374,27 @@ contexts:
 
   table-name-inc:
     - match: '{{peek_key_start}}'
-      push: [nested-key, key-noscope]
+      push: [maybe-dot-table-name, table-name-simple]
     - match: '[^\]]+\]?'
       scope: invalid.illegal.table.toml
       pop: true
 
-  nested-key:
-    - match: '{{ws}}(\.){{ws}}'
+  table-name-simple:
+    - match: '[A-Za-z0-9_-]+'
+      scope: entity.name.table.toml
+      pop: true
+    - include: key-quoted
+    - match: '.'
+      scope: invalid.illegal.table.toml
+      pop: true
+
+  maybe-dot-table-name:
+    - match: '{{dot_peek_key}}'
       captures:
         1: punctuation.separator.table.toml
-      push: key-noscope
-    - match: '(?={{ws}}\])'
+      push: table-name-simple
+    - match: '(?={{ws}}(?:\]|$))'
       pop: true
     - match: '.'
-      scope: invalid.illegal.table-key.toml
+      scope: invalid.illegal.table.toml
       pop: true

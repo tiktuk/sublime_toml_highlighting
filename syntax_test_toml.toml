@@ -9,56 +9,70 @@
 ##############################################################################
 [table]  # comment
 # <- punctuation.definition.table.begin - entity.name.table
-#^^^^^ entity.name.table
+#^^^^^ meta.tag.table entity.name.table
 #     ^ punctuation.definition.table.end - entity.name.table
 #        ^ punctuation.definition.comment
 #        ^^^^^^^^^ comment.line.number-sign
 
 [nested.table]
 # <- punctuation.definition.table.begin - entity.name.table
-#^^^^^^^^^^^^ entity.name.table
+#^^^^^^^^^^^^ meta.tag.table
+#^^^^^^ entity.name.table
 #      ^ punctuation.separator.table
+#       ^^^^^ entity.name.table
 #            ^ punctuation.definition.table.end - entity.name.table
 
 ['quoted']
 #^ punctuation.definition.string.begin
-#^^^^^^^^entity.name.table string.quoted.single.literal
+#^^^^^^^^ meta.tag.table string.quoted.single.literal
 #       ^ punctuation.definition.string.end
 #        ^ punctuation.definition.table.end
 
 ["quoted"]
 #^ punctuation.definition.string.begin
-#^^^^^^^^entity.name.table string.quoted.double.basic
+#^^^^^^^^ meta.tag.table string.quoted.double.basic
 #       ^ punctuation.definition.string.end
 #        ^ punctuation.definition.table.end
 
 [a.b.c]
 # <- punctuation.definition.table.begin - entity.name.table
-#^^^^^ entity.name.table
+#^^^^^ meta.tag.table
+#^ entity.name.table
 # ^ punctuation.separator.table
+#  ^ entity.name.table
 #   ^ punctuation.separator.table
+#    ^ entity.name.table
 #     ^ punctuation.definition.table.end - entity.name.table
 [ d.e.f ]
 # <- punctuation.definition.table.begin - entity.name.table
-#^ -entity.name.table
-# ^^^^^ entity.name.table
+#^ -meta.tag.table
+# ^^^^^ meta.tag.table
+# ^ entity.name.table
 #  ^ punctuation.separator.table
+#   ^ entity.name.table
 #    ^ punctuation.separator.table
-#      ^ -entity.name.table
+#     ^ entity.name.table
+#      ^ -meta.tag.table, -entity.name.table
 #       ^ punctuation.definition.table.end - entity.name.table
 [ g .  h  . i ]
-# ^^^^^^^^^^^ entity.name.table
+# ^^^^^^^^^^^ meta.tag.table
+# ^ meta.tag.table entity.name.table
 #   ^ punctuation.separator.table
+#      ^ entity.name.table
 #         ^ punctuation.separator.table
+#           ^ entity.name.table
 #             ^ punctuation.definition.table.end
 [ j . "ʞ" . 'l' ]
 # <- punctuation.definition.table.begin
-# ^^^^^^^^^^^^^ entity.name.table
+# ^^^^^^^^^^^^^ meta.tag.table
+# ^ entity.name.table
 #   ^ punctuation.separator.table
+#     ^^^ string.quoted.double.basic
 #         ^ punctuation.separator.table
+#           ^^^ string.quoted.single.literal
 #               ^ punctuation.definition.table.end
 ['a'."b"]
-#^^^^^^^ entity.name.table
+#^^^^^^^ meta.tag.table
 #^ punctuation.definition.string.begin
 #^^^ string.quoted.single.literal
 #  ^ punctuation.definition.string.end
@@ -73,12 +87,14 @@
 #-----------------------------------------------------------------------------
  [[array-table]]
 #^^ punctuation.definition.table.array.begin
-#  ^^^^^^^^^^^ entity.name.table.array
+#  ^^^^^^^^^^^ meta.tag.table.array entity.name.table
 #             ^^ punctuation.definition.table.array.end
  [[a.b.'nest'."name"]]
 #^^ punctuation.definition.table.array.begin
-#  ^^^^^^^^^^^^^^^^^ entity.name.table.array
+#  ^^^^^^^^^^^^^^^^^ meta.tag.table.array
+#  ^ meta.tag.table.array entity.name.table
 #   ^ punctuation.separator.table
+#    ^ meta.tag.table.array entity.name.table
 #     ^ punctuation.separator.table
 #      ^ punctuation.definition.string.begin
 #      ^^^^^^ string.quoted.single.literal
@@ -104,12 +120,11 @@
 #  ^^^^^ invalid.illegal
 [a.]   # INVALID
 # <- punctuation.definition.table.begin
-#^^ entity.name.table
-#  ^ invalid.illegal
+#^^ meta.tag.table
+# ^ invalid.illegal
 [a..] # INVALID
-#^^ entity.name.table
-#  ^ invalid.illegal
-#   ^ punctuation.definition.table.end
+#^ meta.tag.table entity.name.table
+# ^^^ invalid.illegal.table
 [.b]   # INVALID
 #^^^ invalid.illegal
 #      ^^^^^^^^^ comment.line.number-sign
@@ -165,24 +180,24 @@ nospace=123
 #      ^ punctuation.definition.key-value
 #       ^^^ constant.numeric.integer
  'key' = 123
+#^^^^^ meta.tag.key string.quoted.single.literal
 #^ punctuation.definition.string.begin
-#^^^^^entity.name.tag string.quoted.single.literal
 #    ^ punctuation.definition.string.end
 #      ^ punctuation.definition.key-value
  "key" = 123
+#^^^^^ meta.tag.key string.quoted.double.basic
 #^ punctuation.definition.string.begin
-#^^^^^entity.name.tag string.quoted.double.basic
 #    ^ punctuation.definition.string.end
 #      ^ punctuation.definition.key-value
  "key\b\t\n\f\r\"\\\u1234\U12345678" = 123
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.tag.key string.quoted.double.basic
 #^ punctuation.definition.string.begin
-#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ entity.name.tag string.quoted.double.basic
-#    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ entity.name.tag string.quoted.double.basic constant.character.escape
+#    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ constant.character.escape
 #                                  ^ punctuation.definition.string.end
 #                                    ^ punctuation.definition.key-value
 'quoted "value"' = "value"
-#<- entity.name.tag string.quoted.single.literal punctuation.definition.string.begin
-#^^^^^^^^^^^^^^^ entity.name.tag string.quoted.single.literal
+#<- meta.tag.key string.quoted.single.literal punctuation.definition.string.begin
+#^^^^^^^^^^^^^^^ meta.tag.key string.quoted.single.literal
 #              ^ punctuation.definition.string.end
 #                ^ punctuation.definition.key-value
 #                  ^ punctuation.definition.string.begin
@@ -191,6 +206,61 @@ nospace=123
 #^^^ entity.name.tag
 #    ^ punctuation.definition.key-value
 #      ^^^ constant.numeric.integer
+
+#-----------------------------------------------------------------------------
+# Dotted keys
+#-----------------------------------------------------------------------------
+ a.b = 123
+#^^^ meta.tag.key
+#^ entity.name.tag
+# ^ punctuation.separator.key
+#  ^ entity.name.tag
+#    ^ punctuation.definition.key-value
+#      ^^^ constant.numeric.integer
+ a.b.c = 1
+#^^^^^ meta.tag.key
+#^ entity.name.tag
+# ^ punctuation.separator.key
+#  ^ entity.name.tag
+#   ^ punctuation.separator.key
+#    ^ entity.name.tag
+#      ^ punctuation.definition.key-value
+#        ^ constant.numeric.integer
+ a.'foo'."bar".c = 1
+#^^^^^^^^^^^^^^^ meta.tag.key
+#^ entity.name.tag
+# ^ punctuation.separator.key
+#  ^^^^^ string.quoted.single.literal
+#  ^ punctuation.definition.string.begin
+#      ^ punctuation.definition.string.end
+#       ^ punctuation.separator.key
+#        ^^^^^ string.quoted.double.basic
+#        ^ punctuation.definition.string.begin
+#            ^ punctuation.definition.string.end
+#             ^ punctuation.separator.key
+#              ^ entity.name.tag
+#                ^ punctuation.definition.key-value
+#                  ^ constant.numeric.integer
+ a  .  b  .  d = 2
+#^^^^^^^^^^^^^ meta.tag.key
+#^ meta.tag.key entity.name.tag
+#   ^ punctuation.separator.key
+#      ^ entity.name.tag
+#         ^ punctuation.separator.key
+#            ^ entity.name.tag
+#              ^ punctuation.definition.key-value
+#                ^ constant.numeric.integer
+ in = { type.name = "cat", type.color = "blue" }
+#       ^^^^^^^^^ meta.tag.key
+#       ^^^^ entity.name.tag
+#           ^ punctuation.separator.key
+#            ^^^^ entity.name.tag
+#                 ^ punctuation.definition.key-value
+#                          ^^^^^^^^^^ meta.tag.key
+#                          ^^^^ entity.name.tag
+#                              ^ punctuation.separator.key
+#                               ^^^^^ entity.name.tag
+#                                     ^ punctuation.definition.key-value
 
 #-----------------------------------------------------------------------------
 # Invalid but accepted keys
@@ -211,9 +281,9 @@ nospace=123
 # Invalid keys
 #-----------------------------------------------------------------------------
 key key
-#  ^^^^ invalid.illegal
+#  ^ invalid.illegal
 key key = 1
-#  ^^^^^^^^ invalid.illegal
+#  ^ invalid.illegal
  '
 #^ invalid.illegal
  'key
@@ -223,7 +293,7 @@ key key = 1
  "key
 #    ^ invalid.illegal
  key.,!@$%^&**&()
-#   ^^^^^^^^^^^^^ invalid.illegal
+#    ^^^^^^^^^^^^ invalid.illegal
  !@$%^&*()
 #^^^^^^^^^ invalid.illegal
  =
@@ -272,7 +342,6 @@ key = true!
 a = 0 # Comment
 #   ^ constant.numeric.integer
 #     ^^^^^^^^^ comment.line.number-sign
-# Spec needs clarification here, see: https://github.com/toml-lang/toml/issues/389
 a = +0
 #   ^ keyword.operator.arithmetic
 #   ^^ constant.numeric.integer
@@ -290,6 +359,22 @@ a = 5_349_221
 #   ^^^^^^^^^ constant.numeric.integer
 a = 1_2_3_4_5     # VALID but discouraged
 #   ^^^^^^^^^ constant.numeric.integer
+
+# hexadecimal with prefix `0x`
+hex1 = 0xDEADBEEF
+#      ^^^^^^^^^^ constant.numeric.integer
+hex2 = 0xdeadbeef
+#      ^^^^^^^^^^ constant.numeric.integer
+hex3 = 0xdead_beef
+#      ^^^^^^^^^^^ constant.numeric.integer
+# octal with prefix `0o`
+oct1 = 0o01234567
+#      ^^^^^^^^^^ constant.numeric.integer
+oct2 = 0o755 # useful for Unix file permissions
+#      ^^^^^ constant.numeric.integer
+# binary with prefix `0b`
+bin1 = 0b11010110
+#      ^^^^^^^^^^ constant.numeric.integer
 
 #-----------------------------------------------------------------------------
 # Invalid integers
@@ -320,7 +405,10 @@ a = _1
 #   ^^ invalid.illegal
 a = 1 2
 #    ^^ invalid.illegal
-
+a = -0x1
+#   ^^^^ invalid.illegal
+a = 0x-1
+#   ^^^^ invalid.illegal
 
 ##############################################################################
 # Float
@@ -344,6 +432,32 @@ a = 6.626e-34
 #   ^^^^^^^^^ constant.numeric.float
 a = 9_224_617.445_991_228_313
 #   ^^^^^^^^^^^^^^^^^^^^^^^^^ constant.numeric.float
+
+# infinity
+sf1 = inf  # positive infinity
+#     ^^^ constant.numeric.float
+sf2 = +inf # positive infinity
+#     ^ constant.numeric.float keyword.operator.arithmetic
+#     ^^^^ constant.numeric.float
+sf3 = -inf # negative infinity
+#     ^ constant.numeric.float keyword.operator.arithmetic
+#     ^^^^ constant.numeric.float
+# not a number
+sf4 = nan  # actual sNaN/qNaN encoding is implementation specific
+#     ^^^ constant.numeric.float
+sf5 = +nan # same as `nan`
+#     ^ constant.numeric.float keyword.operator.arithmetic
+#     ^^^^ constant.numeric.float
+sf6 = -nan # valid, actual encoding is implementation specific
+#     ^ constant.numeric.float keyword.operator.arithmetic
+#     ^^^^ constant.numeric.float
+# zero
+sf7 = +0.0
+#     ^ constant.numeric.float keyword.operator.arithmetic
+#     ^^^^ constant.numeric.float
+sf8 = -0.0
+#     ^ constant.numeric.float keyword.operator.arithmetic
+#     ^^^^ constant.numeric.float
 
 #-----------------------------------------------------------------------------
 # Invalid float
@@ -397,6 +511,16 @@ lt1 = 07:32:00
 #     ^^^^^^^^ constant.other.datetime
 lt2 = 00:32:00.999999
 #     ^^^^^^^^^^^^^^^ constant.other.datetime
+odt1s = 1979-05-27 07:32:00Z
+#       ^^^^^^^^^^^^^^^^^^^^ constant.other.datetime
+odt2s = 1979-05-27 00:32:00-07:00
+#       ^^^^^^^^^^^^^^^^^^^^^^^^^ constant.other.datetime
+odt3s = 1979-05-27 00:32:00.999999-07:00
+#       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ constant.other.datetime
+ldt1s = 1979-05-27 07:32:00
+#       ^^^^^^^^^^^^^^^^^^^ constant.other.datetime
+ldt2s = 1979-05-27 00:32:00.999999
+#       ^^^^^^^^^^^^^^^^^^^^^^^^^^ constant.other.datetime
 
 #-----------------------------------------------------------------------------
 # Invalid Date-Time
@@ -762,7 +886,7 @@ t = {b=true, i=1, f=1.0, dt=1979-05-27T07:32:00Z, s1='s', s2="s", s3='''s''', s4
 t = {,}
 #    ^^ invalid.illegal
 t = {=}
-#    ^^ invalid.illegal
+#     ^ invalid.illegal
 t = {
 }  # comment to clear scope
 #<- invalid.illegal
