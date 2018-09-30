@@ -6,6 +6,7 @@ name: TOML
 file_extensions:
   - toml
   - tml
+  - Pipfile
 
 scope: source.toml
 
